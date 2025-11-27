@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+
+    <!-- MENU PRINCIPAL -->
+    <menuitem 
+        id="menu_bike_shop_root" 
+        name="Bike Shop" 
+        sequence="10"
+    />
+
+    <!-- SOUS-MENU : CATALOGUE -->
+    <menuitem
+        id="menu_bike_shop_catalog"
+        name="Catalogue"
+        parent="menu_bike_shop_root"
+        sequence="10"
+    />
+
+    <!-- SOUS-MENU : MODELES DE VELOS -->
+    <menuitem
+        id="menu_bike_models"
+        name="Modèles de vélos"
+        parent="menu_bike_shop_catalog"
+        action="action_bike_model"
+        sequence="10"
+    />
+
+</odoo>

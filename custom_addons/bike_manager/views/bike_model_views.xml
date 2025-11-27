@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+
+    <!-- LIST VIEW -->
+    <record id="view_bike_model_list" model="ir.ui.view">
+        <field name="name">bike.model.list</field>
+        <field name="model">bike.model</field>
+        <field name="arch" type="xml">
+            <list string="Modèles de vélos">
+                <field name="name"/>
+                <field name="brand"/>
+                <field name="reference"/>
+                <field name="category"/>
+                <field name="price"/>
+                <field name="available_qty"/>
+                <field name="active"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- FORM VIEW -->
+    <record id="view_bike_model_form" model="ir.ui.view">
+        <field name="name">bike.model.form</field>
+        <field name="model">bike.model</field>
+        <field name="arch" type="xml">
+            <form string="Modèle de vélo">
+                <sheet>
+                    <group>
+                        <field name="name"/>
+                        <field name="brand"/>
+                        <field name="reference"/>
+                        <field name="category"/>
+                    </group>
+                    <group>
+                        <field name="price"/>
+                        <field name="available_qty"/>
+                        <field name="active"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- ACTION -->
+    <record id="action_bike_model" model="ir.actions.act_window">
+        <field name="name">Modèles de vélos</field>
+        <field name="res_model">bike.model</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+</odoo>
