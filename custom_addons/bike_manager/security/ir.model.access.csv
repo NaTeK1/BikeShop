@@ -1,2 +1,8 @@
 id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
 access_bike_model,bike.model,model_bike_model,,1,1,1,1
+access_bike_category,bike.category,model_bike_category,,1,1,1,1
+access_bike_product,bike.product,model_bike_product,,1,1,1,1
+access_bike_customer,bike.customer,model_bike_customer,,1,1,1,1
+access_bike_sale_order,bike.sale.order,model_bike_sale_order,,1,1,1,1
+access_bike_sale_order_line,bike.sale.order.line,model_bike_sale_order_line,,1,1,1,1
+access_bike_rental,bike.rental,model_bike_rental,,1,1,1,1

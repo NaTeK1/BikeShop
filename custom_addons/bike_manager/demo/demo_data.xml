@@ -1,0 +1,314 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <!-- Demo Categories -->
+    <record id="category_bikes" model="bike.category">
+        <field name="name">Bikes</field>
+        <field name="description">All types of bikes</field>
+    </record>
+
+    <record id="category_accessories" model="bike.category">
+        <field name="name">Accessories</field>
+        <field name="description">Bike accessories</field>
+    </record>
+
+    <record id="category_parts" model="bike.category">
+        <field name="name">Parts</field>
+        <field name="description">Spare parts</field>
+    </record>
+
+    <record id="category_city_bikes" model="bike.category">
+        <field name="name">City Bikes</field>
+        <field name="parent_id" ref="category_bikes"/>
+    </record>
+
+    <record id="category_mountain_bikes" model="bike.category">
+        <field name="name">Mountain Bikes</field>
+        <field name="parent_id" ref="category_bikes"/>
+    </record>
+
+    <record id="category_electric_bikes" model="bike.category">
+        <field name="name">Electric Bikes</field>
+        <field name="parent_id" ref="category_bikes"/>
+    </record>
+
+    <!-- Demo Bike Models -->
+    <record id="model_city_comfort" model="bike.model">
+        <field name="name">City Comfort 2024</field>
+        <field name="brand">UrbanBike</field>
+        <field name="reference">CB-2024-001</field>
+        <field name="category">city</field>
+        <field name="price">450.00</field>
+        <field name="available_qty">10</field>
+    </record>
+
+    <record id="model_mountain_pro" model="bike.model">
+        <field name="name">Mountain Pro X</field>
+        <field name="brand">TrailMaster</field>
+        <field name="reference">MTB-PRO-X</field>
+        <field name="category">mountain</field>
+        <field name="price">1200.00</field>
+        <field name="available_qty">5</field>
+    </record>
+
+    <record id="model_electric_eco" model="bike.model">
+        <field name="name">E-Bike Eco</field>
+        <field name="brand">GreenRide</field>
+        <field name="reference">EB-ECO-2024</field>
+        <field name="category">electric</field>
+        <field name="price">1800.00</field>
+        <field name="available_qty">8</field>
+    </record>
+
+    <!-- Demo Products (Bikes) -->
+    <record id="product_city_bike_1" model="bike.product">
+        <field name="name">City Comfort Black</field>
+        <field name="reference">PROD-CB-001</field>
+        <field name="product_type">bike</field>
+        <field name="category_id" ref="category_city_bikes"/>
+        <field name="bike_model_id" ref="model_city_comfort"/>
+        <field name="sale_price">450.00</field>
+        <field name="cost_price">250.00</field>
+        <field name="stock_quantity">3</field>
+        <field name="can_be_rented">True</field>
+        <field name="rental_price_hourly">5.00</field>
+        <field name="rental_price_daily">25.00</field>
+        <field name="rental_price_weekly">140.00</field>
+        <field name="rental_price_monthly">450.00</field>
+        <field name="description">Comfortable city bike, perfect for daily commuting</field>
+    </record>
+
+    <record id="product_city_bike_2" model="bike.product">
+        <field name="name">City Comfort Blue</field>
+        <field name="reference">PROD-CB-002</field>
+        <field name="product_type">bike</field>
+        <field name="category_id" ref="category_city_bikes"/>
+        <field name="bike_model_id" ref="model_city_comfort"/>
+        <field name="sale_price">450.00</field>
+        <field name="cost_price">250.00</field>
+        <field name="stock_quantity">3</field>
+        <field name="can_be_rented">True</field>
+        <field name="rental_price_hourly">5.00</field>
+        <field name="rental_price_daily">25.00</field>
+        <field name="rental_price_weekly">140.00</field>
+        <field name="rental_price_monthly">450.00</field>
+        <field name="description">Comfortable city bike in blue color</field>
+    </record>
+
+    <record id="product_mountain_bike_1" model="bike.product">
+        <field name="name">Mountain Pro X Red</field>
+        <field name="reference">PROD-MTB-001</field>
+        <field name="product_type">bike</field>
+        <field name="category_id" ref="category_mountain_bikes"/>
+        <field name="bike_model_id" ref="model_mountain_pro"/>
+        <field name="sale_price">1200.00</field>
+        <field name="cost_price">700.00</field>
+        <field name="stock_quantity">2</field>
+        <field name="can_be_rented">True</field>
+        <field name="rental_price_hourly">12.00</field>
+        <field name="rental_price_daily">50.00</field>
+        <field name="rental_price_weekly">300.00</field>
+        <field name="rental_price_monthly">950.00</field>
+        <field name="description">Professional mountain bike for trails</field>
+    </record>
+
+    <record id="product_electric_bike_1" model="bike.product">
+        <field name="name">E-Bike Eco White</field>
+        <field name="reference">PROD-EB-001</field>
+        <field name="product_type">bike</field>
+        <field name="category_id" ref="category_electric_bikes"/>
+        <field name="bike_model_id" ref="model_electric_eco"/>
+        <field name="sale_price">1800.00</field>
+        <field name="cost_price">1100.00</field>
+        <field name="stock_quantity">2</field>
+        <field name="can_be_rented">True</field>
+        <field name="rental_price_hourly">15.00</field>
+        <field name="rental_price_daily">70.00</field>
+        <field name="rental_price_weekly">420.00</field>
+        <field name="rental_price_monthly">1400.00</field>
+        <field name="description">Electric bike with eco-friendly battery</field>
+    </record>
+
+    <!-- Demo Products (Accessories) -->
+    <record id="product_helmet_1" model="bike.product">
+        <field name="name">Safety Helmet Pro</field>
+        <field name="reference">ACC-HELM-001</field>
+        <field name="product_type">accessory</field>
+        <field name="category_id" ref="category_accessories"/>
+        <field name="sale_price">45.00</field>
+        <field name="cost_price">20.00</field>
+        <field name="stock_quantity">20</field>
+        <field name="description">Professional safety helmet</field>
+    </record>
+
+    <record id="product_lock_1" model="bike.product">
+        <field name="name">Security Lock Heavy Duty</field>
+        <field name="reference">ACC-LOCK-001</field>
+        <field name="product_type">accessory</field>
+        <field name="category_id" ref="category_accessories"/>
+        <field name="sale_price">35.00</field>
+        <field name="cost_price">15.00</field>
+        <field name="stock_quantity">15</field>
+        <field name="description">Heavy-duty bike lock</field>
+    </record>
+
+    <record id="product_light_set" model="bike.product">
+        <field name="name">LED Light Set</field>
+        <field name="reference">ACC-LIGHT-001</field>
+        <field name="product_type">accessory</field>
+        <field name="category_id" ref="category_accessories"/>
+        <field name="sale_price">28.00</field>
+        <field name="cost_price">12.00</field>
+        <field name="stock_quantity">30</field>
+        <field name="description">Front and rear LED lights</field>
+    </record>
+
+    <!-- Demo Products (Parts) -->
+    <record id="product_tire_1" model="bike.product">
+        <field name="name">Tire 26 inch</field>
+        <field name="reference">PART-TIRE-26</field>
+        <field name="product_type">part</field>
+        <field name="category_id" ref="category_parts"/>
+        <field name="sale_price">22.00</field>
+        <field name="cost_price">10.00</field>
+        <field name="stock_quantity">40</field>
+        <field name="description">Standard 26 inch tire</field>
+    </record>
+
+    <record id="product_brake_pads" model="bike.product">
+        <field name="name">Brake Pads Set</field>
+        <field name="reference">PART-BRAKE-001</field>
+        <field name="product_type">part</field>
+        <field name="category_id" ref="category_parts"/>
+        <field name="sale_price">18.00</field>
+        <field name="cost_price">8.00</field>
+        <field name="stock_quantity">50</field>
+        <field name="description">High-quality brake pads</field>
+    </record>
+
+    <!-- Demo Customers -->
+    <record id="customer_john_doe" model="bike.customer">
+        <field name="name">John Doe</field>
+        <field name="email">john.doe@example.com</field>
+        <field name="phone">+32 2 123 4567</field>
+        <field name="mobile">+32 470 12 34 56</field>
+        <field name="street">123 Main Street</field>
+        <field name="city">Brussels</field>
+        <field name="zip_code">1000</field>
+        <field name="birth_date">1990-05-15</field>
+        <field name="id_number">BE-90051512345</field>
+    </record>
+
+    <record id="customer_jane_smith" model="bike.customer">
+        <field name="name">Jane Smith</field>
+        <field name="email">jane.smith@example.com</field>
+        <field name="phone">+32 2 234 5678</field>
+        <field name="mobile">+32 471 23 45 67</field>
+        <field name="street">456 Avenue Louise</field>
+        <field name="city">Brussels</field>
+        <field name="zip_code">1050</field>
+        <field name="birth_date">1985-08-22</field>
+        <field name="id_number">BE-85082223456</field>
+    </record>
+
+    <record id="customer_bob_johnson" model="bike.customer">
+        <field name="name">Bob Johnson</field>
+        <field name="email">bob.johnson@example.com</field>
+        <field name="phone">+32 2 345 6789</field>
+        <field name="mobile">+32 472 34 56 78</field>
+        <field name="street">789 Rue de la Loi</field>
+        <field name="city">Brussels</field>
+        <field name="zip_code">1040</field>
+        <field name="birth_date">1992-11-03</field>
+        <field name="id_number">BE-92110334567</field>
+    </record>
+
+    <!-- Demo Sale Orders -->
+    <record id="sale_order_1" model="bike.sale.order">
+        <field name="name">SO00001</field>
+        <field name="customer_id" ref="customer_john_doe"/>
+        <field name="date" eval="(DateTime.now() - timedelta(days=5)).strftime('%Y-%m-%d %H:%M:%S')"/>
+        <field name="state">done</field>
+        <field name="payment_method">card</field>
+        <field name="is_paid">True</field>
+        <field name="payment_date" eval="(DateTime.now() - timedelta(days=5)).strftime('%Y-%m-%d')"/>
+    </record>
+
+    <record id="sale_order_line_1_1" model="bike.sale.order.line">
+        <field name="order_id" ref="sale_order_1"/>
+        <field name="product_id" ref="product_helmet_1"/>
+        <field name="quantity">1</field>
+        <field name="unit_price">45.00</field>
+    </record>
+
+    <record id="sale_order_line_1_2" model="bike.sale.order.line">
+        <field name="order_id" ref="sale_order_1"/>
+        <field name="product_id" ref="product_lock_1"/>
+        <field name="quantity">1</field>
+        <field name="unit_price">35.00</field>
+    </record>
+
+    <record id="sale_order_2" model="bike.sale.order">
+        <field name="name">SO00002</field>
+        <field name="customer_id" ref="customer_jane_smith"/>
+        <field name="date" eval="(DateTime.now() - timedelta(days=2)).strftime('%Y-%m-%d %H:%M:%S')"/>
+        <field name="state">confirmed</field>
+        <field name="payment_method">cash</field>
+        <field name="is_paid">False</field>
+    </record>
+
+    <record id="sale_order_line_2_1" model="bike.sale.order.line">
+        <field name="order_id" ref="sale_order_2"/>
+        <field name="product_id" ref="product_light_set"/>
+        <field name="quantity">2</field>
+        <field name="unit_price">28.00</field>
+    </record>
+
+    <!-- Demo Rentals -->
+    <record id="rental_1" model="bike.rental">
+        <field name="name">RNT00001</field>
+        <field name="customer_id" ref="customer_bob_johnson"/>
+        <field name="product_id" ref="product_city_bike_1"/>
+        <field name="start_date" eval="(DateTime.now() - timedelta(days=3)).strftime('%Y-%m-%d %H:%M:%S')"/>
+        <field name="end_date" eval="(DateTime.now() + timedelta(days=4)).strftime('%Y-%m-%d %H:%M:%S')"/>
+        <field name="pricing_type">weekly</field>
+        <field name="unit_price">140.00</field>
+        <field name="deposit_amount">100.00</field>
+        <field name="state">ongoing</field>
+        <field name="payment_method">card</field>
+        <field name="is_paid">True</field>
+        <field name="condition_on_pickup">Good condition, all parts working</field>
+    </record>
+
+    <record id="rental_2" model="bike.rental">
+        <field name="name">RNT00002</field>
+        <field name="customer_id" ref="customer_jane_smith"/>
+        <field name="product_id" ref="product_mountain_bike_1"/>
+        <field name="start_date" eval="(DateTime.now() - timedelta(days=10)).strftime('%Y-%m-%d %H:%M:%S')"/>
+        <field name="end_date" eval="(DateTime.now() - timedelta(days=7)).strftime('%Y-%m-%d %H:%M:%S')"/>
+        <field name="actual_return_date" eval="(DateTime.now() - timedelta(days=7)).strftime('%Y-%m-%d %H:%M:%S')"/>
+        <field name="pricing_type">daily</field>
+        <field name="unit_price">50.00</field>
+        <field name="deposit_amount">150.00</field>
+        <field name="state">returned</field>
+        <field name="payment_method">cash</field>
+        <field name="is_paid">True</field>
+        <field name="deposit_returned">True</field>
+        <field name="condition_on_pickup">Excellent condition</field>
+        <field name="condition_on_return">Good condition, minor scratches</field>
+    </record>
+
+    <record id="rental_3" model="bike.rental">
+        <field name="name">RNT00003</field>
+        <field name="customer_id" ref="customer_john_doe"/>
+        <field name="product_id" ref="product_electric_bike_1"/>
+        <field name="start_date" eval="DateTime.now().strftime('%Y-%m-%d %H:%M:%S')"/>
+        <field name="end_date" eval="(DateTime.now() + timedelta(days=1)).strftime('%Y-%m-%d %H:%M:%S')"/>
+        <field name="pricing_type">daily</field>
+        <field name="unit_price">70.00</field>
+        <field name="deposit_amount">200.00</field>
+        <field name="state">draft</field>
+        <field name="payment_method">card</field>
+        <field name="is_paid">False</field>
+    </record>
+
+</odoo>

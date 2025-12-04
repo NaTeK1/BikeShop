@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <!-- Sequence for Sale Orders -->
+    <record id="seq_bike_sale_order" model="ir.sequence">
+        <field name="name">Sale Order Sequence</field>
+        <field name="code">bike.sale.order</field>
+        <field name="prefix">SO</field>
+        <field name="padding">5</field>
+        <field name="number_increment">1</field>
+        <field name="number_next">1</field>
+    </record>
+
+    <!-- Sequence for Rentals -->
+    <record id="seq_bike_rental" model="ir.sequence">
+        <field name="name">Rental Sequence</field>
+        <field name="code">bike.rental</field>
+        <field name="prefix">RNT</field>
+        <field name="padding">5</field>
+        <field name="number_increment">1</field>
+        <field name="number_next">1</field>
+    </record>
+</odoo>

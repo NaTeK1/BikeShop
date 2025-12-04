@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+
+    <!-- Sale Order Tree View -->
+    <record id="view_bike_sale_order_tree" model="ir.ui.view">
+        <field name="name">bike.sale.order.tree</field>
+        <field name="model">bike.sale.order</field>
+        <field name="arch" type="xml">
+            <list string="Sale Orders" decoration-info="state=='draft'"
+                  decoration-success="state=='done'" decoration-muted="state=='cancelled'">
+                <field name="name"/>
+                <field name="customer_id"/>
+                <field name="date"/>
+                <field name="total_amount"/>
+                <field name="state"/>
+                <field name="is_paid"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Sale Order Form View -->
+    <record id="view_bike_sale_order_form" model="ir.ui.view">
+        <field name="name">bike.sale.order.form</field>
+        <field name="model">bike.sale.order</field>
+        <field name="arch" type="xml">
+            <form string="Sale Order">
+                <header>
+                    <button name="action_confirm" string="Confirm Order" type="object"
+                            class="oe_highlight" invisible="state != 'draft'"/>
+                    <button name="action_done" string="Mark as Done" type="object"
+                            class="oe_highlight" invisible="state != 'confirmed'"/>
+                    <button name="action_cancel" string="Cancel" type="object"
+                            invisible="state not in ['draft', 'confirmed']"/>
+                    <button name="action_set_draft" string="Set to Draft" type="object"
+                            invisible="state != 'cancelled'"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,confirmed,done"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="name" readonly="1"/>
+                        </h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="customer_id" readonly="state != 'draft'"/>
+                            <field name="date"/>
+                        </group>
+                        <group>
+                            <field name="payment_method"/>
+                            <field name="is_paid"/>
+                            <field name="payment_date" invisible="not is_paid"/>
+                        </group>
+                    </group>
+
+                    <notebook>
+                        <page string="Order Lines" name="order_lines">
+                            <field name="order_line_ids" readonly="state != 'draft'">
+                                <list editable="bottom">
+                                    <field name="sequence" widget="handle"/>
+                                    <field name="product_id" required="1"/>
+                                    <field name="description"/>
+                                    <field name="quantity"/>
+                                    <field name="unit_price"/>
+                                    <field name="discount"/>
+                                    <field name="subtotal"/>
+                                </list>
+                            </field>
+                            <group class="oe_subtotal_footer oe_right">
+                                <field name="subtotal"/>
+                                <field name="tax_amount"/>
+                                <div class="oe_subtotal_footer_separator oe_inline">
+                                    <label for="total_amount"/>
+                                </div>
+                                <field name="total_amount" class="oe_subtotal_footer_separator"/>
+                            </group>
+                        </page>
+                        <page string="Other Info" name="other_info">
+                            <group>
+                                <field name="notes" placeholder="Order notes..."/>
+                            </group>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Sale Order Search View -->
+    <record id="view_bike_sale_order_search" model="ir.ui.view">
+        <field name="name">bike.sale.order.search</field>
+        <field name="model">bike.sale.order</field>
+        <field name="arch" type="xml">
+            <search string="Sale Orders">
+                <field name="name"/>
+                <field name="customer_id"/>
+            </search>
+        </field>
+    </record>
+
+    <!-- Sale Order Action -->
+    <record id="action_bike_sale_order" model="ir.actions.act_window">
+        <field name="name">Sale Orders</field>
+        <field name="res_model">bike.sale.order</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="view_bike_sale_order_search"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Create your first sale order
+            </p>
+            <p>
+                Manage customer orders with invoicing and stock management.
+            </p>
+        </field>
+    </record>
+
+</odoo>

@@ -6,7 +6,7 @@
         <field name="name">bike.model.list</field>
         <field name="model">bike.model</field>
         <field name="arch" type="xml">
-            <list string="Modèles de vélos">
+            <list string="Bike Models">
                 <field name="name"/>
                 <field name="brand"/>
                 <field name="reference"/>

@@ -11,11 +11,25 @@ Module de base pour la gestion de modèles de vélos.
 """,
     'category': 'Sales',
     'application': True,
-    'depends': ['base'],
+    'depends': ['base', 'sale', 'stock', 'account', 'calendar'],
     'data': [
+        # Security
         'security/ir.model.access.csv',
+
+        # Data
+        'data/sequences.xml',
+
+        # Views
+        'views/category_views.xml',
         'views/bike_model_views.xml',
+        'views/product_views.xml',
+        'views/sale_order_views.xml',
+        'views/rental_views.xml',
+        'views/customer_views.xml',
         'views/menu.xml',
+
+        # Demo data
+        'demo/demo_data.xml',
     ],
     'installable': True,
     'license': 'LGPL-3',
