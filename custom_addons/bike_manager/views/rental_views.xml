@@ -141,15 +141,15 @@
                 <field name="name"/>
                 <field name="customer_id"/>
                 <field name="product_id"/>
-                <filter name="filter_ongoing" string="Ongoing" domain="[('state', '=', 'ongoing')]"/>
-                <filter name="filter_draft" string="Draft" domain="[('state', '=', 'draft')]"/>
-                <filter name="filter_returned" string="Returned" domain="[('state', '=', 'returned')]"/>
+                <filter name="filter_ongoing" string="Ongoing" domain="[('state','=','ongoing')]"/>
+                <filter name="filter_draft" string="Draft" domain="[('state','=','draft')]"/>
+                <filter name="filter_returned" string="Returned" domain="[('state','=','returned')]"/>
                 <separator/>
-                <filter name="filter_unpaid" string="Unpaid" domain="[('is_paid', '=', False)]"/>
+                <filter name="filter_unpaid" string="Unpaid" domain="[('is_paid','=',False)]"/>
                 <group expand="0" string="Group By">
-                    <filter name="group_state" string="Status" context="{'group_by': 'state'}"/>
-                    <filter name="group_customer" string="Customer" context="{'group_by': 'customer_id'}"/>
-                    <filter name="group_product" string="Product" context="{'group_by': 'product_id'}"/>
+                    <filter name="group_state" string="Status" context="{'group_by':'state'}"/>
+                    <filter name="group_customer" string="Customer" context="{'group_by':'customer_id'}"/>
+                    <filter name="group_product" string="Product" context="{'group_by':'product_id'}"/>
                 </group>
             </search>
         </field>
