@@ -51,9 +51,10 @@ class BikeProduct(models.Model):
 
     active = fields.Boolean(string="Active", default=True)
 
-    # Integration with Odoo Stock
-    product_tmpl_id = fields.Many2one('product.template', string="Odoo Product Template",
-                                       help="Link to Odoo product for integration with Stock, Sales, etc.")
+    # Integration with Odoo Stock (optional)
+    # Uncomment after installing stock/product module
+    # product_tmpl_id = fields.Many2one('product.template', string="Odoo Product Template",
+    #                                    help="Link to Odoo product for integration with Stock, Sales, etc.")
 
     # Relations
     rental_ids = fields.One2many('bike.rental', 'product_id', string="Rental History")
@@ -99,51 +100,3 @@ class BikeProduct(models.Model):
         for product in self:
             if product.sale_price < 0 or product.cost_price < 0:
                 raise exceptions.ValidationError("Prices must be positive!")
-
-    @api.onchange('product_tmpl_id')
-    def _onchange_product_tmpl_id(self):
-        """Update product info from Odoo product template"""
-        if self.product_tmpl_id:
-            self.name = self.product_tmpl_id.name
-            self.description = self.product_tmpl_id.description_sale
-            self.sale_price = self.product_tmpl_id.list_price
-            if hasattr(self.product_tmpl_id, 'standard_price'):
-                self.cost_price = self.product_tmpl_id.standard_price
-
-    def action_create_odoo_product(self):
-        """Create an Odoo product from this bike product"""
-        self.ensure_one()
-
-        if self.product_tmpl_id:
-            return {
-                'type': 'ir.actions.act_window',
-                'name': 'Odoo Product',
-                'res_model': 'product.template',
-                'res_id': self.product_tmpl_id.id,
-                'view_mode': 'form',
-                'target': 'current',
-            }
-
-        # Create new product in Odoo
-        product_vals = {
-            'name': self.name,
-            'description_sale': self.description,
-            'list_price': self.sale_price,
-            'standard_price': self.cost_price,
-            'type': 'product' if self.product_type == 'bike' else 'consu',
-            'categ_id': self.env.ref('product.product_category_all').id,
-            'sale_ok': True,
-            'purchase_ok': True,
-        }
-
-        product_tmpl = self.env['product.template'].create(product_vals)
-        self.product_tmpl_id = product_tmpl.id
-
-        return {
-            'type': 'ir.actions.act_window',
-            'name': 'Odoo Product',
-            'res_model': 'product.template',
-            'res_id': product_tmpl.id,
-            'view_mode': 'form',
-            'target': 'current',
-        }

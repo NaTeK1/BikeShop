@@ -11,7 +11,7 @@ Module de base pour la gestion de modèles de vélos.
 """,
     'category': 'Sales',
     'application': True,
-    'depends': ['base', 'sale', 'stock', 'account', 'calendar'],
+    'depends': ['base'],
     'data': [
         # Security
         'security/ir.model.access.csv',

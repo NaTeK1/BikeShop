@@ -60,11 +60,12 @@ class BikeRental(models.Model):
     condition_on_pickup = fields.Text(string="Condition on Pickup")
     condition_on_return = fields.Text(string="Condition on Return")
 
-    # Integration with Odoo modules
-    invoice_id = fields.Many2one('account.move', string="Invoice", readonly=True,
-                                  help="Invoice generated from this rental")
-    calendar_event_id = fields.Many2one('calendar.event', string="Calendar Event", readonly=True,
-                                         help="Calendar event for this rental")
+    # Integration with Odoo modules (optional - requires account and calendar modules)
+    # Uncomment these fields after installing account and calendar modules
+    # invoice_id = fields.Many2one('account.move', string="Invoice", readonly=True,
+    #                               help="Invoice generated from this rental")
+    # calendar_event_id = fields.Many2one('calendar.event', string="Calendar Event", readonly=True,
+    #                                      help="Calendar event for this rental")
 
     active = fields.Boolean(string="Active", default=True)
 
@@ -191,109 +192,3 @@ class BikeRental(models.Model):
             if rental.state not in ['cancelled']:
                 raise exceptions.ValidationError("Only cancelled rentals can be reset to draft!")
             rental.state = 'draft'
-
-    def action_create_invoice(self):
-        """Create an invoice from this rental (Odoo Accounting integration)"""
-        self.ensure_one()
-
-        if not self.env.user.has_group('base.group_user'):
-            return False
-
-        # Check if account module is installed
-        if 'account.move' not in self.env:
-            raise exceptions.UserError("Accounting module is not installed!")
-
-        if self.invoice_id:
-            raise exceptions.UserError("An invoice already exists for this rental!")
-
-        # Get or create partner for the customer
-        partner_id = False
-        if self.customer_id.partner_id:
-            partner_id = self.customer_id.partner_id.id
-        else:
-            # Try to create a partner from customer info
-            partner_vals = {
-                'name': self.customer_id.name,
-                'email': self.customer_id.email,
-                'phone': self.customer_id.phone,
-                'mobile': self.customer_id.mobile,
-                'street': self.customer_id.street,
-                'city': self.customer_id.city,
-                'zip': self.customer_id.zip_code,
-                'country_id': self.customer_id.country_id.id if self.customer_id.country_id else False,
-                'customer_rank': 1,
-            }
-            partner = self.env['res.partner'].create(partner_vals)
-            self.customer_id.partner_id = partner.id
-            partner_id = partner.id
-
-        if not partner_id:
-            raise exceptions.UserError("Could not create invoice. Please link the customer to an Odoo contact first.")
-
-        # Create invoice
-        invoice_vals = {
-            'move_type': 'out_invoice',
-            'partner_id': partner_id,
-            'invoice_date': fields.Date.today(),
-            'invoice_line_ids': [(0, 0, {
-                'name': f"Rental: {self.product_id.name} ({self.start_date.strftime('%Y-%m-%d')} to {self.end_date.strftime('%Y-%m-%d')})",
-                'quantity': self.duration,
-                'price_unit': self.unit_price,
-            })],
-        }
-
-        # Add additional charges if any
-        if self.additional_charges > 0:
-            invoice_vals['invoice_line_ids'].append((0, 0, {
-                'name': 'Additional Charges (Late fees, damages, etc.)',
-                'quantity': 1,
-                'price_unit': self.additional_charges,
-            }))
-
-        try:
-            invoice = self.env['account.move'].create(invoice_vals)
-            self.invoice_id = invoice.id
-            return {
-                'type': 'ir.actions.act_window',
-                'name': 'Invoice',
-                'res_model': 'account.move',
-                'res_id': invoice.id,
-                'view_mode': 'form',
-                'target': 'current',
-            }
-        except Exception as e:
-            # If integration fails, just show a warning
-            raise exceptions.UserError(f"Could not create invoice: {str(e)}")
-
-    def action_create_calendar_event(self):
-        """Create a calendar event for this rental"""
-        self.ensure_one()
-
-        # Check if calendar module is installed
-        if 'calendar.event' not in self.env:
-            raise exceptions.UserError("Calendar module is not installed!")
-
-        if self.calendar_event_id:
-            raise exceptions.UserError("A calendar event already exists for this rental!")
-
-        event_vals = {
-            'name': f"Rental: {self.customer_id.name} - {self.product_id.name}",
-            'start': self.start_date,
-            'stop': self.end_date,
-            'description': f"Rental Reference: {self.name}\nCustomer: {self.customer_id.name}\nProduct: {self.product_id.name}\nTotal Amount: {self.total_amount}",
-            'allday': False,
-        }
-
-        try:
-            event = self.env['calendar.event'].create(event_vals)
-            self.calendar_event_id = event.id
-            return {
-                'type': 'ir.actions.act_window',
-                'name': 'Calendar Event',
-                'res_model': 'calendar.event',
-                'res_id': event.id,
-                'view_mode': 'form',
-                'target': 'current',
-            }
-        except Exception as e:
-            raise exceptions.UserError(f"Could not create calendar event: {str(e)}")

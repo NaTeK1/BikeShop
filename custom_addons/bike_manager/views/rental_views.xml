@@ -34,10 +34,6 @@
                             class="oe_highlight" invisible="state != 'draft'"/>
                     <button name="action_return_bike" string="Return Bike" type="object"
                             class="oe_highlight" invisible="state != 'ongoing'"/>
-                    <button name="action_create_invoice" string="Create Invoice" type="object"
-                            class="btn-primary" invisible="invoice_id or state not in ['ongoing', 'returned']"/>
-                    <button name="action_create_calendar_event" string="Add to Calendar" type="object"
-                            invisible="calendar_event_id"/>
                     <button name="action_cancel" string="Cancel" type="object"
                             invisible="state not in ['draft', 'ongoing']"/>
                     <button name="action_set_draft" string="Set to Draft" type="object"
@@ -93,15 +89,6 @@
                         </group>
                     </group>
 
-                    <group string="Integration" invisible="not invoice_id and not calendar_event_id">
-                        <group>
-                            <field name="invoice_id" readonly="1"/>
-                        </group>
-                        <group>
-                            <field name="calendar_event_id" readonly="1"/>
-                        </group>
-                    </group>
-
                     <notebook>
                         <page string="Conditions" name="conditions">
                             <group>
@@ -137,20 +124,10 @@
         <field name="name">bike.rental.search</field>
         <field name="model">bike.rental</field>
         <field name="arch" type="xml">
-            <search string="Rentals">
+            <search>
                 <field name="name"/>
                 <field name="customer_id"/>
                 <field name="product_id"/>
-                <filter name="filter_ongoing" string="Ongoing" domain="[('state','=','ongoing')]"/>
-                <filter name="filter_draft" string="Draft" domain="[('state','=','draft')]"/>
-                <filter name="filter_returned" string="Returned" domain="[('state','=','returned')]"/>
-                <separator/>
-                <filter name="filter_unpaid" string="Unpaid" domain="[('is_paid','=',False)]"/>
-                <group expand="0" string="Group By">
-                    <filter name="group_state" string="Status" context="{'group_by':'state'}"/>
-                    <filter name="group_customer" string="Customer" context="{'group_by':'customer_id'}"/>
-                    <filter name="group_product" string="Product" context="{'group_by':'product_id'}"/>
-                </group>
             </search>
         </field>
     </record>
