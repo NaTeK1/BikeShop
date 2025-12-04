@@ -17,10 +17,17 @@ Module complet de gestion de vélos avec vente et location pour Odoo.
 Ce module nécessite les modules standards Odoo suivants :
 
 - **base**: Module de base Odoo (inclus par défaut)
-- **sale**: Module de vente Odoo pour la gestion des commandes
-- **stock**: Module de gestion de stock/inventaire
-- **account**: Module de comptabilité pour la facturation
 - **calendar**: Module de calendrier pour planifier les locations
+- **contacts**: Gestion des contacts et partenaires
+- **crm**: CRM pour la gestion de la relation client
+- **sale_management**: Module de vente Odoo pour la gestion des commandes
+- **board**: Tableaux de bord et reporting
+- **account**: Module de comptabilité pour la facturation
+- **website**: Site web et e-commerce
+- **stock**: Module de gestion de stock/inventaire
+- **link_tracker**: Suivi des liens et campagnes marketing
+
+**Note**: Lors de l'installation du module Bike Shop, tous ces modules seront automatiquement installés s'ils ne le sont pas déjà.
 
 ### Librairies Python
 
