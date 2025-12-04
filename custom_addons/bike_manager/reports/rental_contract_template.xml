@@ -1,0 +1,201 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <template id="report_rental_contract_document">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="o">
+                <t t-call="web.external_layout">
+                    <div class="page">
+                        <!-- Header -->
+                        <div class="text-center mb-4">
+                            <h1>BIKE RENTAL CONTRACT</h1>
+                            <h3 class="text-muted"><t t-esc="o.name"/></h3>
+                        </div>
+
+                        <!-- Contract Information -->
+                        <div class="row mt-4 mb-4">
+                            <div class="col-6">
+                                <h4>Customer Information</h4>
+                                <table class="table table-sm">
+                                    <tr>
+                                        <td><strong>Name:</strong></td>
+                                        <td><t t-esc="o.customer_id.name"/></td>
+                                    </tr>
+                                    <tr t-if="o.customer_id.email">
+                                        <td><strong>Email:</strong></td>
+                                        <td><t t-esc="o.customer_id.email"/></td>
+                                    </tr>
+                                    <tr t-if="o.customer_id.phone">
+                                        <td><strong>Phone:</strong></td>
+                                        <td><t t-esc="o.customer_id.phone"/></td>
+                                    </tr>
+                                    <tr t-if="o.customer_id.street">
+                                        <td><strong>Address:</strong></td>
+                                        <td>
+                                            <t t-esc="o.customer_id.street"/><br/>
+                                            <span t-if="o.customer_id.city"><t t-esc="o.customer_id.zip_code"/> <t t-esc="o.customer_id.city"/></span>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </div>
+                            <div class="col-6">
+                                <h4>Rental Information</h4>
+                                <table class="table table-sm">
+                                    <tr>
+                                        <td><strong>Contract #:</strong></td>
+                                        <td><t t-esc="o.name"/></td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Status:</strong></td>
+                                        <td>
+                                            <span t-if="o.state == 'draft'" class="badge badge-secondary">Draft</span>
+                                            <span t-if="o.state == 'ongoing'" class="badge badge-warning">Ongoing</span>
+                                            <span t-if="o.state == 'returned'" class="badge badge-success">Returned</span>
+                                            <span t-if="o.state == 'cancelled'" class="badge badge-danger">Cancelled</span>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Pricing Type:</strong></td>
+                                        <td><t t-esc="o.pricing_type.title()"/></td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- Bike Information -->
+                        <div class="row mb-4">
+                            <div class="col-12">
+                                <h4>Rented Bike</h4>
+                                <table class="table table-bordered">
+                                    <thead style="background-color: #f8f9fa;">
+                                        <tr>
+                                            <th>Product</th>
+                                            <th>Reference</th>
+                                            <th>Category</th>
+                                            <th class="text-right">Unit Price</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td><strong><t t-esc="o.product_id.name"/></strong></td>
+                                            <td><t t-esc="o.product_id.reference"/></td>
+                                            <td><t t-esc="o.product_id.category_id.name"/></td>
+                                            <td class="text-right"><t t-esc="'%.2f' % o.unit_price"/> €</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- Rental Period -->
+                        <div class="row mb-4">
+                            <div class="col-12">
+                                <h4>Rental Period</h4>
+                                <table class="table table-bordered">
+                                    <tr>
+                                        <td width="25%"><strong>Start Date:</strong></td>
+                                        <td width="25%"><t t-esc="o.start_date.strftime('%Y-%m-%d %H:%M')"/></td>
+                                        <td width="25%"><strong>End Date:</strong></td>
+                                        <td width="25%"><t t-esc="o.end_date.strftime('%Y-%m-%d %H:%M')"/></td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Duration:</strong></td>
+                                        <td><t t-esc="'%.2f' % o.duration"/> <t t-esc="o.pricing_type"/>(s)</td>
+                                        <td t-if="o.actual_return_date"><strong>Actual Return:</strong></td>
+                                        <td t-if="o.actual_return_date"><t t-esc="o.actual_return_date.strftime('%Y-%m-%d %H:%M')"/></td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- Pricing Details -->
+                        <div class="row mb-4">
+                            <div class="col-12">
+                                <h4>Pricing Details</h4>
+                                <table class="table table-bordered">
+                                    <tr>
+                                        <td width="75%"><strong>Rental Price (<t t-esc="'%.2f' % o.duration"/> <t t-esc="o.pricing_type"/>(s) × <t t-esc="'%.2f' % o.unit_price"/> €)</strong></td>
+                                        <td width="25%" class="text-right"><t t-esc="'%.2f' % o.total_price"/> €</td>
+                                    </tr>
+                                    <tr t-if="o.deposit_amount > 0">
+                                        <td><strong>Deposit Amount</strong></td>
+                                        <td class="text-right"><t t-esc="'%.2f' % o.deposit_amount"/> €</td>
+                                    </tr>
+                                    <tr t-if="o.additional_charges > 0" style="background-color: #fff3cd;">
+                                        <td><strong>Additional Charges (Late fees, damages, etc.)</strong></td>
+                                        <td class="text-right"><t t-esc="'%.2f' % o.additional_charges"/> €</td>
+                                    </tr>
+                                    <tr style="background-color: #d4edda; font-size: 1.2em;">
+                                        <td><strong>TOTAL AMOUNT</strong></td>
+                                        <td class="text-right"><strong><t t-esc="'%.2f' % o.total_amount"/> €</strong></td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Payment Method:</strong></td>
+                                        <td class="text-right">
+                                            <t t-if="o.payment_method"><t t-esc="o.payment_method.title()"/></t>
+                                            <t t-else="">Not Specified</t>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Payment Status:</strong></td>
+                                        <td class="text-right">
+                                            <span t-if="o.is_paid" class="badge badge-success">Paid</span>
+                                            <span t-else="" class="badge badge-warning">Unpaid</span>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- Conditions -->
+                        <div class="row mb-4" t-if="o.condition_on_pickup or o.condition_on_return">
+                            <div class="col-12">
+                                <h4>Bike Condition</h4>
+                                <table class="table table-bordered">
+                                    <tr t-if="o.condition_on_pickup">
+                                        <td width="25%"><strong>Condition on Pickup:</strong></td>
+                                        <td width="75%"><t t-esc="o.condition_on_pickup"/></td>
+                                    </tr>
+                                    <tr t-if="o.condition_on_return">
+                                        <td><strong>Condition on Return:</strong></td>
+                                        <td><t t-esc="o.condition_on_return"/></td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- Notes -->
+                        <div class="row mb-4" t-if="o.notes">
+                            <div class="col-12">
+                                <h4>Notes</h4>
+                                <p><t t-esc="o.notes"/></p>
+                            </div>
+                        </div>
+
+                        <!-- Signatures -->
+                        <div class="row mt-5">
+                            <div class="col-6">
+                                <p class="mb-0"><strong>Customer Signature:</strong></p>
+                                <div style="border-bottom: 1px solid black; width: 200px; height: 50px; margin-top: 10px;"></div>
+                                <p class="mt-2"><small>Date: _________________</small></p>
+                            </div>
+                            <div class="col-6">
+                                <p class="mb-0"><strong>Bike Shop Representative:</strong></p>
+                                <div style="border-bottom: 1px solid black; width: 200px; height: 50px; margin-top: 10px;"></div>
+                                <p class="mt-2"><small>Date: _________________</small></p>
+                            </div>
+                        </div>
+
+                        <!-- Footer -->
+                        <div class="row mt-5">
+                            <div class="col-12 text-center text-muted">
+                                <small>
+                                    This document was generated on <t t-esc="context_timestamp(datetime.datetime.now()).strftime('%Y-%m-%d %H:%M')"/>
+                                </small>
+                            </div>
+                        </div>
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+</odoo>

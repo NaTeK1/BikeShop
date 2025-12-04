@@ -22,6 +22,7 @@ Module de base pour la gestion de modèles de vélos.
         'website',       # Website
         'stock',         # Inventory
         'link_tracker',  # Link Tracker
+        'website_sale',  # eCommerce
     ],
     'data': [
         # Security
@@ -29,6 +30,10 @@ Module de base pour la gestion de modèles de vélos.
 
         # Data
         'data/sequences.xml',
+
+        # Reports
+        'reports/report_rental_contract.xml',
+        'reports/rental_contract_template.xml',
 
         # Views
         'views/category_views.xml',
