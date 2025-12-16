@@ -8,10 +8,12 @@ class BikeProduct(models.Model):
     _name = "bike.product"
     _description = "Bike Product"
     _order = "name"
+    _inherit = ["image.mixin"]
 
     name = fields.Char(string="Product Name", required=True)
     reference = fields.Char(string="Internal Reference", required=True, copy=False)
     description = fields.Text(string="Description")
+    image_1920 = fields.Image(string="Image", max_width=1920, max_height=1920)
 
     # Product type
     product_type = fields.Selection([
@@ -100,3 +102,9 @@ class BikeProduct(models.Model):
         for product in self:
             if product.sale_price < 0 or product.cost_price < 0:
                 raise exceptions.ValidationError("Prices must be positive!")
+
+    @api.constrains('image_1920')
+    def _check_image_required(self):
+        for product in self:
+            if not product.image_1920:
+                raise exceptions.ValidationError("Please add an image for each product.")

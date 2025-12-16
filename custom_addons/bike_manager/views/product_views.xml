@@ -17,6 +17,7 @@
                 <field name="state" decoration-success="state=='available'"
                        decoration-warning="state=='rented'"
                        decoration-danger="state=='sold'"/>
+                <field name="image_1920" widget="image" class="oe_avatar"/>
             </list>
         </field>
     </record>
@@ -38,6 +39,8 @@
                             <field name="product_type"/>
                             <field name="category_id"/>
                             <field name="bike_model_id" invisible="product_type != 'bike'"/>
+                            <field name="image_1920" widget="image" class="oe_avatar"
+                                   options="{'preview_image': 'image_1920'}"/>
                         </group>
                         <group string="Stock &amp; Pricing">
                             <field name="sale_price"/>
@@ -100,20 +103,31 @@
                 <field name="sale_price"/>
                 <field name="stock_quantity"/>
                 <field name="state"/>
+                <field name="image_1920"/>
                 <templates>
                     <t t-name="card">
-                        <div class="oe_kanban_card oe_kanban_global_click">
-                            <div class="oe_kanban_content">
-                                <strong><field name="name"/></strong>
-                                <div>Ref: <field name="reference"/></div>
-                                <div>Price: <field name="sale_price"/> €</div>
-                                <div>Stock: <field name="stock_quantity"/></div>
-                                <div>
-                                    <span t-att-class="'badge badge-pill badge-' + (record.state.raw_value === 'available' ? 'success' : record.state.raw_value === 'rented' ? 'warning' : 'danger')">
-                                        <field name="state"/>
-                                    </span>
-                                </div>
+                        <div class="oe_kanban_card oe_kanban_global_click o_bike_card">
+                        <div class="o_bike_card_inner">
+
+                            <div class="o_bike_img">
+                            <field name="image_1920" widget="image"
+                                    options="{'preview_image': 'image_1920'}"/>
                             </div>
+
+                            <div class="oe_kanban_content o_bike_info">
+                            <strong><field name="name"/></strong>
+                            <div>Ref: <field name="reference"/></div>
+                            <div>Price: <field name="sale_price"/> €</div>
+                            <div>Stock: <field name="stock_quantity"/></div>
+
+                            <div>
+                                <span t-att-class="'badge badge-pill badge-' + (record.state.raw_value == 'available' and 'success' or record.state.raw_value == 'rented' and 'warning' or 'danger')">
+                                <field name="state"/>
+                                </span>
+                            </div>
+                            </div>
+
+                        </div>
                         </div>
                     </t>
                 </templates>

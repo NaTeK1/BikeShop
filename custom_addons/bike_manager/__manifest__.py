@@ -49,4 +49,10 @@ Module de base pour la gestion de modèles de vélos.
     ],
     'installable': True,
     'license': 'LGPL-3',
+    'assets': {
+        'web.assets_backend': [
+            'bike_manager/static/src/css/bike_kanban.css',
+        ],
+    },
+
 }
