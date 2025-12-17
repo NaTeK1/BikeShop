@@ -1,5 +1,6 @@
 from odoo import models, fields, api, exceptions, _
 from datetime import datetime, timedelta
+from odoo.exceptions import ValidationError
 
 
 class BikeRental(models.Model):
@@ -191,3 +192,112 @@ class BikeRental(models.Model):
             if rental.state not in ['cancelled']:
                 raise exceptions.ValidationError(_("Seules les locations annulées peuvent repasser en brouillon !"))
             rental.state = 'draft'
+
+    # Facturation
+    invoice_id = fields.Many2one("account.move", string="Facture", readonly=True, copy=False)
+    invoice_state = fields.Selection(related="invoice_id.state", string="Statut facture", readonly=True)
+
+    def _get_sale_journal(self):
+        journal = self.env["account.journal"].search([
+            ("type", "=", "sale"),
+            ("company_id", "=", self.env.company.id)
+        ], limit=1)
+        if not journal:
+            raise ValidationError(_("Aucun journal de vente trouvé (type = sale)."))
+        return journal
+
+    def _get_income_account(self):
+        Account = self.env["account.account"]
+        domain = []
+
+        # Filtre "income" (selon version)
+        if "account_type" in Account._fields:
+            domain.append(("account_type", "=", "income"))
+        elif "internal_group" in Account._fields:
+            domain.append(("internal_group", "=", "income"))
+
+        # Actif / pas déprécié (selon version)
+        if "active" in Account._fields:
+            domain.append(("active", "=", True))
+        if "deprecated" in Account._fields:
+            domain.append(("deprecated", "=", False))
+
+        # Filtre société (selon version)
+        if "company_id" in Account._fields:
+            domain.append(("company_id", "=", self.env.company.id))
+        elif "company_ids" in Account._fields:
+            domain.append(("company_ids", "in", self.env.company.id))
+
+        acc = Account.search(domain, limit=1)
+        if not acc:
+            raise ValidationError("Aucun compte de revenu (income) trouvé.")
+        return acc
+
+    def _get_sale_tax_21(self):
+        Tax = self.env["account.tax"]
+        domain = [("type_tax_use", "=", "sale"), ("amount", "=", 21)]
+
+        if "company_id" in Tax._fields:
+            domain.append(("company_id", "=", self.env.company.id))
+        elif "company_ids" in Tax._fields:
+            domain.append(("company_ids", "in", self.env.company.id))
+
+        return Tax.search(domain, limit=1)
+
+    def action_create_invoice(self):
+        self.ensure_one()
+        if self.invoice_id:
+            return self.action_view_invoice()
+
+        partner = self.customer_id._get_or_create_partner()
+        journal = self._get_sale_journal()
+        income_account = self._get_income_account()
+        tax = self._get_sale_tax_21()
+
+        line_vals = [{
+            "name": _("Location vélo: %s") % (self.product_id.name),
+            "quantity": 1.0,
+            "price_unit": self.total_price,
+            "account_id": income_account.id,
+            "tax_ids": [(6, 0, tax.ids)] if tax else False,
+        }]
+
+        if self.additional_charges:
+            line_vals.append({
+                "name": _("Frais supplémentaires (retard/dommages)"),
+                "quantity": 1.0,
+                "price_unit": self.additional_charges,
+                "account_id": income_account.id,
+                "tax_ids": [(6, 0, tax.ids)] if tax else False,
+            })
+
+        move = self.env["account.move"].create({
+            "move_type": "out_invoice",
+            "partner_id": partner.id,
+            "invoice_date": fields.Date.context_today(self),
+            "journal_id": journal.id,
+            "invoice_origin": self.name,
+            "ref": self.name,
+            "invoice_line_ids": [(0, 0, v) for v in line_vals],
+        })
+
+        self.invoice_id = move.id
+        return self.action_view_invoice()
+
+    def action_view_invoice(self):
+        self.ensure_one()
+        if not self.invoice_id:
+            raise ValidationError(_("Aucune facture liée à cette location."))
+        return {
+            "type": "ir.actions.act_window",
+            "name": _("Facture"),
+            "res_model": "account.move",
+            "view_mode": "form",
+            "res_id": self.invoice_id.id,
+        }
+
+    def action_print_invoice(self):
+        self.ensure_one()
+        if not self.invoice_id:
+            raise ValidationError(_("Aucune facture à imprimer."))
+        return self.invoice_id.action_invoice_print()

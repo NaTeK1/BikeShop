@@ -102,6 +102,32 @@
                         </page>
                     </notebook>
                 </sheet>
+
+                <!-- Facturation -->
+                <div class="oe_button_box" name="button_box">
+                    <button name="action_create_invoice" type="object" class="oe_stat_button"
+                            icon="fa-file-text-o" invisible="invoice_id">
+                        <div class="o_stat_info">
+                            <span class="o_stat_text">Créer facture</span>
+                        </div>
+                    </button>
+
+                    <button name="action_view_invoice" type="object" class="oe_stat_button"
+                            icon="fa-eye" invisible="not invoice_id">
+                        <div class="o_stat_info">
+                            <span class="o_stat_text">Voir facture</span>
+                        </div>
+                    </button>
+                    <!-- Bouton Imprimer désactivé pour l'instant
+                    <button name="action_print_invoice" type="object" class="oe_stat_button"
+                            icon="fa-print" invisible="not invoice_id">
+                        <div class="o_stat_info">
+                            <span class="o_stat_text">Imprimer</span>
+                        </div>
+                    </button> -->
+                </div>
+                <field name="invoice_id" invisible="1"/>
+
             </form>
         </field>
     </record>

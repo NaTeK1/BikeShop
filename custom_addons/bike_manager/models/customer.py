@@ -59,3 +59,30 @@ class BikeCustomer(models.Model):
                 display = f"{display} ({customer.email})"
             res.append((customer.id, display))
         return res
+
+    # Facturation
+    partner_id = fields.Many2one("res.partner", string="Contact Odoo", readonly=True, copy=False)
+
+    def _prepare_partner_vals(self):
+        self.ensure_one()
+        return {
+            "name": self.name,
+            "email": self.email,
+            "phone": self.phone or self.mobile,
+            "street": self.street,
+            "street2": self.street2,
+            "zip": self.zip,
+            "city": self.city,
+            "country_id": self.country_id.id if self.country_id else False,
+            "company_type": "person",
+        }
+
+    def _get_or_create_partner(self):
+        self.ensure_one()
+        if self.partner_id:
+            # optionnel: resync des infos
+            self.partner_id.write(self._prepare_partner_vals())
+            return self.partner_id
+        partner = self.env["res.partner"].create(self._prepare_partner_vals())
+        self.partner_id = partner.id
+        return partner
