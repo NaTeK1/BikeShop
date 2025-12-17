@@ -1,58 +1,65 @@
 {
-    'name': 'Bike Shop',
-    'version': '1.0',
-    'summary': 'Bike sales and rentals management',
-    'author': 'Jeremy Robalino Robles & Damian Koc',
-    'website': '',
-    'description': """
+    "name": "Bike Shop",
+    "version": "1.0.0",
+    "summary": "Gestion des ventes et des locations de vélos",
+    "description": """
 Bike Shop
-=========
-Module de base pour la gestion de modèles de vélos.
+=================
+
+Ce module permet de gérer une boutique de vélos :
+
+- Catalogue : catégories, modèles, produits (avec images)
+- Ventes : commandes, lignes de commande, paiement, mise à jour du stock
+- Locations : contrats, tarification, suivi, retour, frais éventuels
+- Clients : fiche client + historique ventes et locations
+- Rapport PDF : contrat de location
+
+Interface et libellés en français.
 """,
-    'category': 'Sales',
-    'application': True,
-    'depends': [
-        'base',
-        'calendar',      # Calendar
-        'contacts',      # Contacts
-        'crm',           # CRM
-        'sale_management',  # Sales
-        'board',         # Dashboards
-        'account',       # Invoicing/Accounting
-        'website',       # Website
-        'stock',         # Inventory
-        'link_tracker',  # Link Tracker
-        'website_sale',  # eCommerce
+    "author": "Jeremy Robalino Robles & Damian Koc",
+    "website": "",
+    "category": "Ventes",
+    "application": True,
+    "installable": True,
+    "license": "LGPL-3",
+    "depends": [
+        "base",
+        "calendar",
+        "contacts",
+        "crm",
+        "sale_management",
+        "board",
+        "account",
+        "website",
+        "stock",
+        "link_tracker",
+        "website_sale"
     ],
-    'data': [
-        # Security
-        'security/ir.model.access.csv',
+    "data": [
+        "demo/demo_data.xml",
 
-        # Data
-        'data/sequences.xml',
+        # Sécurité
+        "security/ir.model.access.csv",
 
-        # Reports
-        'reports/report_rental_contract.xml',
-        'reports/rental_contract_template.xml',
+        # Séquences
+        "data/sequences.xml",
 
-        # Views
-        'views/category_views.xml',
-        'views/bike_model_views.xml',
-        'views/product_views.xml',
-        'views/sale_order_views.xml',
-        'views/rental_views.xml',
-        'views/customer_views.xml',
-        'views/menu.xml',
+        # Vues
+        "views/category_views.xml",
+        "views/bike_model_views.xml",
+        "views/product_views.xml",
+        "views/customer_views.xml",
+        "views/rental_views.xml",
+        "views/sale_order_views.xml",
+        "views/menu.xml",
 
-        # Demo data
-        'demo/demo_data.xml',
+        # Rapports
+        "reports/report_rental_contract.xml",
+        "reports/rental_contract_template.xml",
     ],
-    'installable': True,
-    'license': 'LGPL-3',
-    'assets': {
-        'web.assets_backend': [
-            'bike_manager/static/src/css/bike_kanban.css',
+    "assets": {
+        "web.assets_backend": [
+            "bike_manager/static/src/css/bike_kanban.css",
         ],
     },
-
 }

@@ -1,81 +1,82 @@
-from odoo import models, fields, api, exceptions
+from odoo import models, fields, api, exceptions, _
 from datetime import datetime, timedelta
 
 
 class BikeRental(models.Model):
     """
-    Bike rental management with pricing and availability
+    Gestion des locations de vélos (tarifs + disponibilité)
     """
     _name = "bike.rental"
-    _description = "Bike Rental"
+    _description = "Location de vélo"
     _order = "start_date desc, name desc"
 
-    name = fields.Char(string="Rental Reference", required=True, copy=False, readonly=True, default='New')
-    customer_id = fields.Many2one('bike.customer', string="Customer", required=True, ondelete='restrict')
-    product_id = fields.Many2one('bike.product', string="Bike/Product", required=True, ondelete='restrict',
-                                  domain="[('can_be_rented', '=', True)]")
+    name = fields.Char(string="Référence de location", required=True, copy=False, readonly=True, default='New')
+    customer_id = fields.Many2one('bike.customer', string="Client", required=True, ondelete='restrict')
+    product_id = fields.Many2one(
+        'bike.product',
+        string="Vélo / Produit",
+        required=True,
+        ondelete='restrict',
+        domain="[('can_be_rented', '=', True)]"
+    )
 
-    # Rental period
-    start_date = fields.Datetime(string="Start Date", required=True, default=fields.Datetime.now)
-    end_date = fields.Datetime(string="End Date", required=True)
-    actual_return_date = fields.Datetime(string="Actual Return Date")
+    # Période de location
+    start_date = fields.Datetime(string="Date de début", required=True, default=fields.Datetime.now)
+    end_date = fields.Datetime(string="Date de fin", required=True)
+    actual_return_date = fields.Datetime(string="Date de retour réelle")
 
-    # Pricing
+    # Tarification
     pricing_type = fields.Selection([
-        ('hourly', 'Hourly'),
-        ('daily', 'Daily'),
-        ('weekly', 'Weekly'),
-        ('monthly', 'Monthly')
-    ], string="Pricing Type", required=True, default='daily')
+        ('hourly', 'Horaire'),
+        ('daily', 'Journalier'),
+        ('weekly', 'Hebdomadaire'),
+        ('monthly', 'Mensuel')
+    ], string="Type de tarification", required=True, default='daily')
 
-    unit_price = fields.Float(string="Unit Price", required=True)
-    duration = fields.Float(string="Duration", compute='_compute_duration', store=True)
-    total_price = fields.Float(string="Total Price", compute='_compute_total_price', store=True)
+    unit_price = fields.Float(string="Prix unitaire", required=True)
+    duration = fields.Float(string="Durée", compute='_compute_duration', store=True)
+    total_price = fields.Float(string="Prix total", compute='_compute_total_price', store=True)
 
-    # Additional charges
-    deposit_amount = fields.Float(string="Deposit Amount", default=0.0)
-    additional_charges = fields.Float(string="Additional Charges", default=0.0,
-                                       help="Late fees, damage charges, etc.")
-    total_amount = fields.Float(string="Total Amount", compute='_compute_total_amount', store=True)
+    # Frais supplémentaires
+    deposit_amount = fields.Float(string="Montant de la caution", default=0.0)
+    additional_charges = fields.Float(
+        string="Frais supplémentaires",
+        default=0.0,
+        help="Retard, dommages, etc."
+    )
+    total_amount = fields.Float(string="Montant total", compute='_compute_total_amount', store=True)
 
-    # Status
+    # Statut
     state = fields.Selection([
-        ('draft', 'Draft'),
-        ('ongoing', 'Ongoing'),
-        ('returned', 'Returned'),
-        ('cancelled', 'Cancelled')
-    ], string="Status", default='draft', required=True)
+        ('draft', 'Brouillon'),
+        ('ongoing', 'En cours'),
+        ('returned', 'Retournée'),
+        ('cancelled', 'Annulée')
+    ], string="Statut", default='draft', required=True)
 
-    # Payment
+    # Paiement
     payment_method = fields.Selection([
-        ('cash', 'Cash'),
-        ('card', 'Card'),
-        ('transfer', 'Bank Transfer')
-    ], string="Payment Method")
+        ('cash', 'Espèces'),
+        ('card', 'Carte'),
+        ('transfer', 'Virement bancaire')
+    ], string="Mode de paiement")
 
-    is_paid = fields.Boolean(string="Paid", default=False)
-    deposit_returned = fields.Boolean(string="Deposit Returned", default=False)
+    is_paid = fields.Boolean(string="Payée", default=False)
+    deposit_returned = fields.Boolean(string="Caution rendue", default=False)
 
     notes = fields.Text(string="Notes")
-    condition_on_pickup = fields.Text(string="Condition on Pickup")
-    condition_on_return = fields.Text(string="Condition on Return")
+    condition_on_pickup = fields.Text(string="État lors du retrait")
+    condition_on_return = fields.Text(string="État lors du retour")
 
-    # Integration with Odoo modules (optional - requires account and calendar modules)
-    # Uncomment these fields after installing account and calendar modules
-    # invoice_id = fields.Many2one('account.move', string="Invoice", readonly=True,
-    #                               help="Invoice generated from this rental")
-    # calendar_event_id = fields.Many2one('calendar.event', string="Calendar Event", readonly=True,
-    #                                      help="Calendar event for this rental")
-
-    active = fields.Boolean(string="Active", default=True)
+    active = fields.Boolean(string="Actif", default=True)
 
     _sql_constraints = [
-        ('check_dates', 'CHECK(end_date > start_date)', 'End date must be after start date!')
+        ('check_dates', 'CHECK(end_date > start_date)', 'La date de fin doit être après la date de début !')
     ]
 
     @api.model
     def create(self, vals_list):
-        """Generate rental reference on create"""
+        """Génère la référence de location à la création"""
         for vals in vals_list:
             if vals.get('name', 'New') == 'New':
                 vals['name'] = self.env['ir.sequence'].next_by_code('bike.rental') or 'New'
@@ -83,7 +84,7 @@ class BikeRental(models.Model):
 
     @api.depends('start_date', 'end_date', 'pricing_type')
     def _compute_duration(self):
-        """Compute rental duration based on pricing type"""
+        """Calcule la durée selon le type de tarification"""
         for rental in self:
             if rental.start_date and rental.end_date:
                 delta = rental.end_date - rental.start_date
@@ -104,19 +105,19 @@ class BikeRental(models.Model):
 
     @api.depends('duration', 'unit_price')
     def _compute_total_price(self):
-        """Compute total rental price"""
+        """Calcule le prix total de location"""
         for rental in self:
             rental.total_price = rental.duration * rental.unit_price
 
     @api.depends('total_price', 'deposit_amount', 'additional_charges')
     def _compute_total_amount(self):
-        """Compute total amount including deposit and additional charges"""
+        """Calcule le montant total (location + frais supplémentaires)."""
         for rental in self:
             rental.total_amount = rental.total_price + rental.additional_charges
 
     @api.onchange('product_id', 'pricing_type')
     def _onchange_product_pricing(self):
-        """Update unit price when product or pricing type changes"""
+        """Met à jour le prix unitaire selon le vélo et le type de tarification"""
         if self.product_id and self.pricing_type:
             if self.pricing_type == 'hourly':
                 self.unit_price = self.product_id.rental_price_hourly
@@ -129,12 +130,10 @@ class BikeRental(models.Model):
 
     @api.constrains('product_id', 'start_date', 'end_date', 'state')
     def _check_availability(self):
-        """Check if product is available for the rental period"""
+        """Vérifie la disponibilité du produit sur la période"""
         for rental in self:
             if rental.state in ['draft', 'ongoing']:
-                # Check if product is available
                 if rental.product_id.available_quantity < 1:
-                    # Check for overlapping rentals
                     overlapping = self.search([
                         ('id', '!=', rental.id),
                         ('product_id', '=', rental.product_id.id),
@@ -144,51 +143,51 @@ class BikeRental(models.Model):
                         '&', ('start_date', '<', rental.end_date), ('end_date', '>=', rental.end_date)
                     ])
                     if overlapping:
-                        raise exceptions.ValidationError(
-                            f"Product {rental.product_id.name} is not available for the selected period!"
-                        )
+                        raise exceptions.ValidationError(_(
+                            "Le produit %(product)s n’est pas disponible pour la période sélectionnée !"
+                        ) % {'product': rental.product_id.name})
 
     def action_start_rental(self):
-        """Start the rental"""
+        """Démarre la location"""
         for rental in self:
             if rental.state != 'draft':
-                raise exceptions.ValidationError("Only draft rentals can be started!")
+                raise exceptions.ValidationError(_("Seules les locations en brouillon peuvent être démarrées !"))
 
             if rental.product_id.available_quantity < 1:
-                raise exceptions.ValidationError(
-                    f"Product {rental.product_id.name} is not available!"
-                )
+                raise exceptions.ValidationError(_(
+                    "Le produit %(product)s n’est pas disponible !"
+                ) % {'product': rental.product_id.name})
 
             rental.state = 'ongoing'
             rental.start_date = fields.Datetime.now()
 
     def action_return_bike(self):
-        """Return the bike"""
+        """Retour du vélo"""
         for rental in self:
             if rental.state != 'ongoing':
-                raise exceptions.ValidationError("Only ongoing rentals can be returned!")
+                raise exceptions.ValidationError(_("Seules les locations en cours peuvent être retournées !"))
 
             rental.actual_return_date = fields.Datetime.now()
 
-            # Calculate late fees if applicable
+            # Frais de retard (si applicable)
             if rental.actual_return_date > rental.end_date:
                 late_duration = (rental.actual_return_date - rental.end_date).total_seconds() / 3600
                 if rental.pricing_type == 'daily':
                     late_days = late_duration / 24
-                    rental.additional_charges += late_days * rental.unit_price * 1.5  # 150% for late returns
+                    rental.additional_charges += late_days * rental.unit_price * 1.5  # 150% en cas de retard
 
             rental.state = 'returned'
 
     def action_cancel(self):
-        """Cancel the rental"""
+        """Annule la location"""
         for rental in self:
             if rental.state == 'returned':
-                raise exceptions.ValidationError("Cannot cancel a returned rental!")
+                raise exceptions.ValidationError(_("Impossible d’annuler une location retournée !"))
             rental.state = 'cancelled'
 
     def action_set_draft(self):
-        """Reset rental to draft"""
+        """Remet la location en brouillon"""
         for rental in self:
             if rental.state not in ['cancelled']:
-                raise exceptions.ValidationError("Only cancelled rentals can be reset to draft!")
+                raise exceptions.ValidationError(_("Seules les locations annulées peuvent repasser en brouillon !"))
             rental.state = 'draft'

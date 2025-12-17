@@ -3,67 +3,59 @@ from odoo import models, fields, api
 
 class BikeCustomer(models.Model):
     """
-    Customer management with sales and rental history
+    Gestion des clients avec historique ventes et locations
     """
     _name = "bike.customer"
-    _description = "Customer"
+    _description = "Client"
     _order = "name"
 
-    name = fields.Char(string="Customer Name", required=True)
-    email = fields.Char(string="Email")
-    phone = fields.Char(string="Phone")
-    mobile = fields.Char(string="Mobile")
+    # Identité / contact
+    name = fields.Char(string="Nom du client", required=True)
+    email = fields.Char(string="E-mail")
+    phone = fields.Char(string="Téléphone")
+    mobile = fields.Char(string="GSM")
 
-    # Address
-    street = fields.Char(string="Street")
-    street2 = fields.Char(string="Street 2")
-    city = fields.Char(string="City")
-    zip_code = fields.Char(string="Zip Code")
-    country_id = fields.Many2one('res.country', string="Country")
+    # Adresse
+    street = fields.Char(string="Rue")
+    street2 = fields.Char(string="Complément d’adresse")
+    zip = fields.Char(string="Code postal")
+    city = fields.Char(string="Ville")
+    country_id = fields.Many2one("res.country", string="Pays")
 
-    # Additional info
-    birth_date = fields.Date(string="Birth Date")
-    id_number = fields.Char(string="ID Number", help="Identity card or passport number")
     notes = fields.Text(string="Notes")
+    active = fields.Boolean(string="Actif", default=True)
 
-    # Integration with Odoo Contacts (optional)
-    # Uncomment after installing contacts/sales module
-    # partner_id = fields.Many2one('res.partner', string="Odoo Contact",
-    #                               help="Link to Odoo contact for integration with Sales, Accounting, etc.")
+    # Historique
+    sale_order_ids = fields.One2many("bike.sale.order", "customer_id", string="Commandes de vente")
+    rental_ids = fields.One2many("bike.rental", "customer_id", string="Locations")
 
-    # Relations
-    sale_order_ids = fields.One2many('bike.sale.order', 'customer_id', string="Sales Orders")
-    rental_ids = fields.One2many('bike.rental', 'customer_id', string="Rentals")
+    # Statistiques
+    sale_count = fields.Integer(string="Nombre de ventes", compute="_compute_stats", store=True)
+    rental_count = fields.Integer(string="Nombre de locations", compute="_compute_stats", store=True)
+    total_sales_amount = fields.Float(string="Total ventes", compute="_compute_stats", store=True)
+    total_rental_amount = fields.Float(string="Total locations", compute="_compute_stats", store=True)
 
-    # Statistics
-    sale_count = fields.Integer(string="Number of Sales", compute='_compute_statistics')
-    rental_count = fields.Integer(string="Number of Rentals", compute='_compute_statistics')
-    total_sales_amount = fields.Float(string="Total Sales Amount", compute='_compute_statistics')
-    total_rental_amount = fields.Float(string="Total Rental Amount", compute='_compute_statistics')
-
-    active = fields.Boolean(string="Active", default=True)
-
-    @api.depends('sale_order_ids', 'sale_order_ids.state', 'rental_ids', 'rental_ids.state')
-    def _compute_statistics(self):
-        """Compute customer statistics"""
+    @api.depends(
+        "sale_order_ids", "sale_order_ids.state", "sale_order_ids.total_amount",
+        "rental_ids", "rental_ids.state", "rental_ids.total_amount"
+    )
+    def _compute_stats(self):
         for customer in self:
-            # Sales statistics
-            confirmed_sales = customer.sale_order_ids.filtered(lambda s: s.state in ['confirmed', 'done'])
+            confirmed_sales = customer.sale_order_ids.filtered(lambda s: s.state in ["confirmed", "done"])
+            confirmed_rentals = customer.rental_ids.filtered(lambda r: r.state in ["ongoing", "returned"])
+
             customer.sale_count = len(confirmed_sales)
-            customer.total_sales_amount = sum(confirmed_sales.mapped('total_amount'))
-
-            # Rental statistics
-            confirmed_rentals = customer.rental_ids.filtered(lambda r: r.state in ['ongoing', 'returned'])
             customer.rental_count = len(confirmed_rentals)
-            customer.total_rental_amount = sum(confirmed_rentals.mapped('total_price'))
 
-    @api.depends('name', 'email')
+            customer.total_sales_amount = sum(confirmed_sales.mapped("total_amount"))
+            customer.total_rental_amount = sum(confirmed_rentals.mapped("total_amount"))
+
     def name_get(self):
-        """Display name with email"""
-        result = []
+        """Nom affiché: Nom (email) si dispo"""
+        res = []
         for customer in self:
-            name = customer.name
+            display = customer.name
             if customer.email:
-                name = f"{name} ({customer.email})"
-            result.append((customer.id, name))
-        return result
+                display = f"{display} ({customer.email})"
+            res.append((customer.id, display))
+        return res

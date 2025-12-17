@@ -1,57 +1,54 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <odoo>
 
-    <!-- Category Tree View -->
+    <!-- Vue liste Catégories -->
     <record id="view_bike_category_tree" model="ir.ui.view">
         <field name="name">bike.category.tree</field>
         <field name="model">bike.category</field>
         <field name="arch" type="xml">
-            <list string="Product Categories">
+            <list string="Catégories">
                 <field name="name"/>
-                <field name="parent_id"/>
                 <field name="product_count"/>
                 <field name="active"/>
             </list>
         </field>
     </record>
 
-    <!-- Category Form View -->
+    <!-- Vue formulaire Catégorie -->
     <record id="view_bike_category_form" model="ir.ui.view">
         <field name="name">bike.category.form</field>
         <field name="model">bike.category</field>
         <field name="arch" type="xml">
-            <form string="Product Category">
+            <form string="Catégorie">
                 <sheet>
+                    <div class="oe_title">
+                        <h1><field name="name"/></h1>
+                    </div>
+
                     <group>
-                        <group>
-                            <field name="name"/>
-                            <field name="parent_id"/>
-                        </group>
-                        <group>
-                            <field name="product_count"/>
+                        <group string="Informations">
                             <field name="active"/>
                         </group>
+                        <group string="Statistiques">
+                            <field name="product_count" readonly="1"/>
+                        </group>
                     </group>
-                    <group>
-                        <field name="description" placeholder="Category description..."/>
+
+                    <group string="Description">
+                        <field name="description" nolabel="1" placeholder="Description de la catégorie..."/>
                     </group>
+
                     <notebook>
-                        <page string="Products" name="products">
+                        <page string="Produits" name="products">
                             <field name="product_ids">
-                                <list>
+                                <list string="Produits">
                                     <field name="reference"/>
                                     <field name="name"/>
                                     <field name="product_type"/>
                                     <field name="sale_price"/>
                                     <field name="stock_quantity"/>
-                                </list>
-                            </field>
-                        </page>
-                        <page string="Subcategories" name="subcategories">
-                            <field name="child_ids">
-                                <list>
-                                    <field name="name"/>
-                                    <field name="product_count"/>
+                                    <field name="state"/>
+                                    <field name="active"/>
                                 </list>
                             </field>
                         </page>
@@ -61,17 +58,30 @@
         </field>
     </record>
 
-    <!-- Category Action -->
+    <!-- Vue recherche Catégories -->
+    <record id="view_bike_category_search" model="ir.ui.view">
+        <field name="name">bike.category.search</field>
+        <field name="model">bike.category</field>
+        <field name="arch" type="xml">
+            <search string="Catégories">
+                <field name="name"/>
+                <field name="active"/>
+            </search>
+        </field>
+    </record>
+
+    <!-- Action Catégories -->
     <record id="action_bike_category" model="ir.actions.act_window">
-        <field name="name">Product Categories</field>
+        <field name="name">Catégories</field>
         <field name="res_model">bike.category</field>
         <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="view_bike_category_search"/>
         <field name="help" type="html">
             <p class="o_view_nocontent_smiling_face">
-                Create your first product category
+                Créez votre première catégorie
             </p>
             <p>
-                Categories help organize your products (bikes, accessories, parts).
+                Classez vos produits par catégories pour mieux les gérer et les filtrer.
             </p>
         </field>
     </record>

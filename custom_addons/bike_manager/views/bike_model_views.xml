@@ -1,51 +1,107 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <odoo>
 
-    <!-- LIST VIEW -->
-    <record id="view_bike_model_list" model="ir.ui.view">
-        <field name="name">bike.model.list</field>
+    <!-- Vue liste Modèles -->
+    <record id="view_bike_model_tree" model="ir.ui.view">
+        <field name="name">bike.model.tree</field>
         <field name="model">bike.model</field>
         <field name="arch" type="xml">
-            <list string="Bike Models">
-                <field name="name"/>
+            <list string="Modèles de vélos">
                 <field name="brand"/>
-                <field name="reference"/>
-                <field name="category"/>
-                <field name="price"/>
-                <field name="available_qty"/>
+                <field name="name"/>
+                <field name="year"/>
+                <field name="category_id"/>
+                <field name="frame_material"/>
+                <field name="wheel_size"/>
+                <field name="product_count"/>
                 <field name="active"/>
             </list>
         </field>
     </record>
 
-    <!-- FORM VIEW -->
+    <!-- Vue formulaire Modèle -->
     <record id="view_bike_model_form" model="ir.ui.view">
         <field name="name">bike.model.form</field>
         <field name="model">bike.model</field>
         <field name="arch" type="xml">
             <form string="Modèle de vélo">
                 <sheet>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="brand" placeholder="Marque" class="oe_inline"/>
+                            <span class="oe_inline"> </span>
+                            <field name="name" placeholder="Nom du modèle" class="oe_inline"/>
+                        </h1>
+                    </div>
+
                     <group>
-                        <field name="name"/>
-                        <field name="brand"/>
-                        <field name="reference"/>
-                        <field name="category"/>
+                        <group string="Informations">
+                            <field name="year"/>
+                            <field name="category_id"/>
+                            <field name="active"/>
+                        </group>
+                        <group string="Caractéristiques">
+                            <field name="frame_material"/>
+                            <field name="wheel_size"/>
+                            <field name="product_count" readonly="1"/>
+                        </group>
                     </group>
-                    <group>
-                        <field name="price"/>
-                        <field name="available_qty"/>
-                        <field name="active"/>
+
+                    <group string="Description">
+                        <field name="description" nolabel="1" placeholder="Description du modèle..."/>
                     </group>
+
+                    <notebook>
+                        <page string="Produits liés" name="products">
+                            <field name="product_ids">
+                                <list string="Produits">
+                                    <field name="reference"/>
+                                    <field name="name"/>
+                                    <field name="category_id"/>
+                                    <field name="sale_price"/>
+                                    <field name="stock_quantity"/>
+                                    <field name="available_quantity"/>
+                                    <field name="state"/>
+                                    <field name="active"/>
+                                </list>
+                            </field>
+                        </page>
+                    </notebook>
                 </sheet>
             </form>
         </field>
     </record>
 
-    <!-- ACTION -->
+    <!-- Vue recherche Modèles -->
+    <record id="view_bike_model_search" model="ir.ui.view">
+        <field name="name">bike.model.search</field>
+        <field name="model">bike.model</field>
+        <field name="arch" type="xml">
+            <search string="Modèles de vélos">
+                <field name="name"/>
+                <field name="brand"/>
+                <field name="category_id"/>
+                <field name="frame_material"/>
+                <field name="wheel_size"/>
+                <field name="active"/>
+            </search>
+        </field>
+    </record>
+
+    <!-- Action Modèles -->
     <record id="action_bike_model" model="ir.actions.act_window">
         <field name="name">Modèles de vélos</field>
         <field name="res_model">bike.model</field>
         <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="view_bike_model_search"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Créez votre premier modèle
+            </p>
+            <p>
+                Utilisez les modèles pour standardiser les informations (marque, roues, matériau, etc.).
+            </p>
+        </field>
     </record>
 
 </odoo>

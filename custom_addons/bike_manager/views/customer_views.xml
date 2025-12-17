@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <odoo>
 
-    <!-- Customer Tree View -->
+    <!-- Vue liste Clients -->
     <record id="view_bike_customer_tree" model="ir.ui.view">
         <field name="name">bike.customer.tree</field>
         <field name="model">bike.customer</field>
         <field name="arch" type="xml">
-            <list string="Customers">
+            <list string="Clients">
                 <field name="name"/>
                 <field name="email"/>
                 <field name="phone"/>
@@ -14,77 +14,80 @@
                 <field name="sale_count"/>
                 <field name="rental_count"/>
                 <field name="total_sales_amount"/>
+                <field name="total_rental_amount"/>
+                <field name="active"/>
             </list>
         </field>
     </record>
 
-    <!-- Customer Form View -->
+    <!-- Vue formulaire Client -->
     <record id="view_bike_customer_form" model="ir.ui.view">
         <field name="name">bike.customer.form</field>
         <field name="model">bike.customer</field>
         <field name="arch" type="xml">
-            <form string="Customer">
+            <form string="Client">
                 <sheet>
+                    <div class="oe_title">
+                        <h1><field name="name"/></h1>
+                    </div>
+
                     <group>
-                        <group string="Contact Information">
-                            <field name="name"/>
+                        <group string="Contact">
                             <field name="email"/>
                             <field name="phone"/>
                             <field name="mobile"/>
-                        </group>
-                        <group string="Additional Information">
-                            <field name="birth_date"/>
-                            <field name="id_number"/>
                             <field name="active"/>
                         </group>
-                    </group>
 
-                    <group string="Address">
-                        <group>
+                        <group string="Adresse">
                             <field name="street"/>
                             <field name="street2"/>
-                        </group>
-                        <group>
+                            <field name="zip"/>
                             <field name="city"/>
-                            <field name="zip_code"/>
                             <field name="country_id"/>
                         </group>
                     </group>
 
-                    <group string="Statistics">
+                    <group string="Statistiques">
                         <group>
-                            <field name="total_sales_amount"/>
+                            <field name="sale_count" readonly="1"/>
+                            <field name="total_sales_amount" readonly="1"/>
                         </group>
                         <group>
-                            <field name="total_rental_amount"/>
+                            <field name="rental_count" readonly="1"/>
+                            <field name="total_rental_amount" readonly="1"/>
                         </group>
                     </group>
 
                     <notebook>
-                        <page string="Sales History" name="sales">
+                        <page string="Commandes de vente" name="sales">
                             <field name="sale_order_ids">
-                                <list>
+                                <list string="Commandes">
                                     <field name="name"/>
                                     <field name="date"/>
                                     <field name="total_amount"/>
                                     <field name="state"/>
+                                    <field name="is_paid"/>
                                 </list>
                             </field>
                         </page>
-                        <page string="Rental History" name="rentals">
+
+                        <page string="Locations" name="rentals">
                             <field name="rental_ids">
-                                <list>
+                                <list string="Locations">
                                     <field name="name"/>
                                     <field name="product_id"/>
                                     <field name="start_date"/>
                                     <field name="end_date"/>
-                                    <field name="total_price"/>
+                                    <field name="total_amount"/>
                                     <field name="state"/>
+                                    <field name="is_paid"/>
                                 </list>
                             </field>
                         </page>
+
                         <page string="Notes" name="notes">
-                            <field name="notes" placeholder="Customer notes..."/>
+                            <field name="notes" placeholder="Notes sur le client..."/>
                         </page>
                     </notebook>
                 </sheet>
@@ -92,32 +95,33 @@
         </field>
     </record>
 
-    <!-- Customer Search View -->
+    <!-- Vue recherche Clients -->
     <record id="view_bike_customer_search" model="ir.ui.view">
         <field name="name">bike.customer.search</field>
         <field name="model">bike.customer</field>
         <field name="arch" type="xml">
-            <search string="Customers">
+            <search string="Clients">
                 <field name="name"/>
                 <field name="email"/>
                 <field name="phone"/>
                 <field name="city"/>
+                <field name="active"/>
             </search>
         </field>
     </record>
 
-    <!-- Customer Action -->
+    <!-- Action Clients -->
     <record id="action_bike_customer" model="ir.actions.act_window">
-        <field name="name">Customers</field>
+        <field name="name">Clients</field>
         <field name="res_model">bike.customer</field>
         <field name="view_mode">list,form</field>
         <field name="search_view_id" ref="view_bike_customer_search"/>
         <field name="help" type="html">
             <p class="o_view_nocontent_smiling_face">
-                Create your first customer
+                Créez votre premier client
             </p>
             <p>
-                Track customer information and their purchase/rental history.
+                Suivez les informations des clients et leur historique d’achats / locations.
             </p>
         </field>
     </record>

@@ -1,40 +1,43 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <odoo>
 
-    <!-- Product Tree View -->
+    <!-- Vue liste Produits -->
     <record id="view_bike_product_tree" model="ir.ui.view">
-        <field name="name">bike.product.tree</field>
+        <field name="name">bike.product.list</field>
         <field name="model">bike.product</field>
         <field name="arch" type="xml">
-            <list string="Products">
+            <list string="Produits">
                 <field name="reference"/>
                 <field name="name"/>
                 <field name="product_type"/>
                 <field name="category_id"/>
                 <field name="sale_price"/>
                 <field name="stock_quantity"/>
+                <field name="reserved_quantity"/>
                 <field name="available_quantity"/>
-                <field name="state" decoration-success="state=='available'"
-                       decoration-warning="state=='rented'"
-                       decoration-danger="state=='sold'"/>
-                <field name="image_1920" widget="image" class="oe_avatar"/>
+                <field name="state"/>
+                <field name="active"/>
             </list>
         </field>
     </record>
 
-    <!-- Product Form View -->
+    <!-- Vue formulaire Produit -->
     <record id="view_bike_product_form" model="ir.ui.view">
         <field name="name">bike.product.form</field>
         <field name="model">bike.product</field>
         <field name="arch" type="xml">
-            <form string="Product">
+            <form string="Produit">
                 <header>
                     <field name="state" widget="statusbar"/>
                 </header>
+
                 <sheet>
+                    <div class="oe_title">
+                        <h1><field name="name"/></h1>
+                    </div>
+
                     <group>
-                        <group string="Basic Information">
-                            <field name="name"/>
+                        <group string="Informations de base">
                             <field name="reference"/>
                             <field name="product_type"/>
                             <field name="category_id"/>
@@ -42,41 +45,39 @@
                             <field name="image_1920" widget="image" class="oe_avatar"
                                    options="{'preview_image': 'image_1920'}"/>
                         </group>
-                        <group string="Stock &amp; Pricing">
+
+                        <group string="Stock et prix">
                             <field name="sale_price"/>
                             <field name="cost_price"/>
                             <field name="stock_quantity"/>
-                            <field name="reserved_quantity"/>
-                            <field name="available_quantity"/>
+                            <field name="reserved_quantity" readonly="1"/>
+                            <field name="available_quantity" readonly="1"/>
                             <field name="active"/>
                         </group>
                     </group>
 
                     <group string="Description">
-                        <field name="description" nolabel="1" placeholder="Product description..."/>
+                        <field name="description" nolabel="1" placeholder="Description du produit..."/>
                     </group>
 
                     <notebook>
-                        <page string="Rental Information" name="rental_info">
+                        <page string="Informations de location" name="rental_info">
                             <group>
-                                <group>
-                                    <field name="can_be_rented"/>
-                                </group>
+                                <field name="can_be_rented"/>
                             </group>
-                            <group string="Rental Pricing" invisible="not can_be_rented">
-                                <group>
+                            <group invisible="not can_be_rented">
+                                <group string="Tarifs">
                                     <field name="rental_price_hourly"/>
                                     <field name="rental_price_daily"/>
-                                </group>
-                                <group>
                                     <field name="rental_price_weekly"/>
                                     <field name="rental_price_monthly"/>
                                 </group>
                             </group>
                         </page>
-                        <page string="Rental History" name="rental_history" invisible="not can_be_rented">
+
+                        <page string="Historique des locations" name="rental_history" invisible="not can_be_rented">
                             <field name="rental_ids">
-                                <list>
+                                <list string="Locations">
                                     <field name="name"/>
                                     <field name="customer_id"/>
                                     <field name="start_date"/>
@@ -92,42 +93,35 @@
         </field>
     </record>
 
-    <!-- Product Kanban View -->
+    <!-- Vue kanban Produits -->
     <record id="view_bike_product_kanban" model="ir.ui.view">
         <field name="name">bike.product.kanban</field>
         <field name="model">bike.product</field>
         <field name="arch" type="xml">
-            <kanban>
+            <kanban class="o_kanban_small_column">
                 <field name="name"/>
                 <field name="reference"/>
                 <field name="sale_price"/>
-                <field name="stock_quantity"/>
-                <field name="state"/>
+                <field name="available_quantity"/>
+                <field name="product_type"/>
+                <field name="category_id"/>
                 <field name="image_1920"/>
+
                 <templates>
                     <t t-name="card">
-                        <div class="oe_kanban_card oe_kanban_global_click o_bike_card">
-                        <div class="o_bike_card_inner">
-
-                            <div class="o_bike_img">
-                            <field name="image_1920" widget="image"
+                        <div class="o_kanban_record d-flex">
+                            <div class="o_kanban_image me-2">
+                                <field name="image_1920" widget="image"
                                     options="{'preview_image': 'image_1920'}"/>
                             </div>
 
-                            <div class="oe_kanban_content o_bike_info">
-                            <strong><field name="name"/></strong>
-                            <div>Ref: <field name="reference"/></div>
-                            <div>Price: <field name="sale_price"/> €</div>
-                            <div>Stock: <field name="stock_quantity"/></div>
-
-                            <div>
-                                <span t-att-class="'badge badge-pill badge-' + (record.state.raw_value == 'available' and 'success' or record.state.raw_value == 'rented' and 'warning' or 'danger')">
-                                <field name="state"/>
-                                </span>
+                            <div class="o_kanban_details flex-grow-1">
+                                <strong><field name="name"/></strong>
+                                <div><field name="reference"/></div>
+                                <div><field name="product_type"/></div>
+                                <div>Prix : <field name="sale_price"/>€</div>
+                                <div>Dispo : <field name="available_quantity"/></div>
                             </div>
-                            </div>
-
-                        </div>
                         </div>
                     </t>
                 </templates>
@@ -135,31 +129,34 @@
         </field>
     </record>
 
-    <!-- Product Search View -->
+
+    <!-- Vue recherche Produits -->
     <record id="view_bike_product_search" model="ir.ui.view">
         <field name="name">bike.product.search</field>
         <field name="model">bike.product</field>
         <field name="arch" type="xml">
-            <search string="Products">
+            <search string="Produits">
                 <field name="name"/>
                 <field name="reference"/>
                 <field name="category_id"/>
+                <field name="product_type"/>
+                <field name="state"/>
             </search>
         </field>
     </record>
 
-    <!-- Product Action -->
+    <!-- Action Produits -->
     <record id="action_bike_product" model="ir.actions.act_window">
-        <field name="name">Products</field>
+        <field name="name">Produits</field>
         <field name="res_model">bike.product</field>
         <field name="view_mode">kanban,list,form</field>
         <field name="search_view_id" ref="view_bike_product_search"/>
         <field name="help" type="html">
             <p class="o_view_nocontent_smiling_face">
-                Create your first product
+                Créez votre premier produit
             </p>
             <p>
-                Products can be bikes, accessories, or spare parts.
+                Les produits peuvent être des vélos, des accessoires ou des pièces.
             </p>
         </field>
     </record>

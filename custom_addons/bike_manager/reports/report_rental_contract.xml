@@ -1,14 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <odoo>
-    <!-- Rental Contract Report Action -->
+
     <record id="action_report_rental_contract" model="ir.actions.report">
-        <field name="name">Rental Contract</field>
+        <field name="name">Contrat de location</field>
         <field name="model">bike.rental</field>
         <field name="report_type">qweb-pdf</field>
         <field name="report_name">bike_manager.report_rental_contract_document</field>
         <field name="report_file">bike_manager.report_rental_contract_document</field>
-        <field name="print_report_name">'Rental Contract - %s' % object.name</field>
+        <field name="print_report_name">'Contrat de location - %s' % object.name</field>
         <field name="binding_model_id" ref="model_bike_rental"/>
         <field name="binding_type">report</field>
     </record>
+
 </odoo>

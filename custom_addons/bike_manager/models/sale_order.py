@@ -1,51 +1,51 @@
-from odoo import models, fields, api, exceptions
+from odoo import models, fields, api, exceptions, _
 from datetime import datetime
 
 
 class BikeSaleOrder(models.Model):
     """
-    Sales order management with invoicing and stock management
+    Gestion des commandes de vente avec mise à jour du stock
     """
     _name = "bike.sale.order"
-    _description = "Sale Order"
+    _description = "Commande de vente"
     _order = "date desc, name desc"
 
-    name = fields.Char(string="Order Reference", required=True, copy=False, readonly=True, default='New')
-    customer_id = fields.Many2one('bike.customer', string="Customer", required=True, ondelete='restrict')
-    date = fields.Datetime(string="Order Date", required=True, default=fields.Datetime.now)
+    name = fields.Char(string="Référence de commande", required=True, copy=False, readonly=True, default='New')
+    customer_id = fields.Many2one('bike.customer', string="Client", required=True, ondelete='restrict')
+    date = fields.Datetime(string="Date de commande", required=True, default=fields.Datetime.now)
 
-    # Order lines
-    order_line_ids = fields.One2many('bike.sale.order.line', 'order_id', string="Order Lines")
+    # Lignes de commande
+    order_line_ids = fields.One2many('bike.sale.order.line', 'order_id', string="Lignes de commande")
 
-    # Amounts
-    subtotal = fields.Float(string="Subtotal", compute='_compute_amounts', store=True)
-    tax_amount = fields.Float(string="Tax Amount", compute='_compute_amounts', store=True)
-    total_amount = fields.Float(string="Total Amount", compute='_compute_amounts', store=True)
+    # Montants
+    subtotal = fields.Float(string="Sous-total", compute='_compute_amounts', store=True)
+    tax_amount = fields.Float(string="TVA", compute='_compute_amounts', store=True)
+    total_amount = fields.Float(string="Total", compute='_compute_amounts', store=True)
 
-    # Status
+    # Statut
     state = fields.Selection([
-        ('draft', 'Draft'),
-        ('confirmed', 'Confirmed'),
-        ('done', 'Done'),
-        ('cancelled', 'Cancelled')
-    ], string="Status", default='draft', required=True)
+        ('draft', 'Brouillon'),
+        ('confirmed', 'Confirmée'),
+        ('done', 'Terminée'),
+        ('cancelled', 'Annulée')
+    ], string="Statut", default='draft', required=True)
 
-    # Payment
+    # Paiement
     payment_method = fields.Selection([
-        ('cash', 'Cash'),
-        ('card', 'Card'),
-        ('transfer', 'Bank Transfer')
-    ], string="Payment Method")
+        ('cash', 'Espèces'),
+        ('card', 'Carte'),
+        ('transfer', 'Virement bancaire')
+    ], string="Mode de paiement")
 
-    is_paid = fields.Boolean(string="Paid", default=False)
-    payment_date = fields.Date(string="Payment Date")
+    is_paid = fields.Boolean(string="Payée", default=False)
+    payment_date = fields.Date(string="Date de paiement")
 
     notes = fields.Text(string="Notes")
-    active = fields.Boolean(string="Active", default=True)
+    active = fields.Boolean(string="Actif", default=True)
 
     @api.model
     def create(self, vals_list):
-        """Generate order reference on create"""
+        """Génère la référence de commande à la création"""
         for vals in vals_list:
             if vals.get('name', 'New') == 'New':
                 vals['name'] = self.env['ir.sequence'].next_by_code('bike.sale.order') or 'New'
@@ -53,46 +53,50 @@ class BikeSaleOrder(models.Model):
 
     @api.depends('order_line_ids', 'order_line_ids.subtotal')
     def _compute_amounts(self):
-        """Compute order amounts"""
+        """Calcule les montants de la commande"""
         for order in self:
             order.subtotal = sum(order.order_line_ids.mapped('subtotal'))
-            order.tax_amount = order.subtotal * 0.21  # 21% VAT
+            order.tax_amount = order.subtotal * 0.21  # TVA 21%
             order.total_amount = order.subtotal + order.tax_amount
 
     def action_confirm(self):
-        """Confirm the order and update stock"""
+        """Confirme la commande et met à jour le stock"""
         for order in self:
             if not order.order_line_ids:
-                raise exceptions.ValidationError("Cannot confirm an order without lines!")
+                raise exceptions.ValidationError(_("Impossible de confirmer une commande sans lignes !"))
 
-            # Check stock availability
+            # Vérifier la disponibilité du stock
             for line in order.order_line_ids:
                 if line.product_id.stock_quantity < line.quantity:
-                    raise exceptions.ValidationError(
-                        f"Insufficient stock for product {line.product_id.name}. "
-                        f"Available: {line.product_id.stock_quantity}, Requested: {line.quantity}"
-                    )
+                    raise exceptions.ValidationError(_(
+                        "Stock insuffisant pour le produit %(product)s. "
+                        "Disponible : %(available)s, Demandé : %(requested)s"
+                    ) % {
+                        'product': line.product_id.name,
+                        'available': line.product_id.stock_quantity,
+                        'requested': line.quantity,
+                    })
 
-            # Update stock
+            # Mise à jour du stock
             for line in order.order_line_ids:
                 line.product_id.stock_quantity -= line.quantity
 
             order.state = 'confirmed'
 
     def action_done(self):
-        """Mark order as done"""
+        """Marque la commande comme terminée"""
         for order in self:
             if order.state != 'confirmed':
-                raise exceptions.ValidationError("Only confirmed orders can be marked as done!")
+                raise exceptions.ValidationError(_("Seules les commandes confirmées peuvent être terminées !"))
             order.state = 'done'
 
     def action_cancel(self):
-        """Cancel the order and restore stock"""
+        """Annule la commande et restaure le stock si nécessaire"""
         for order in self:
             if order.state == 'done':
-                raise exceptions.ValidationError("Cannot cancel a done order!")
+                raise exceptions.ValidationError(_("Impossible d’annuler une commande terminée !"))
 
-            # Restore stock if order was confirmed
+            # Restaurer le stock si la commande était confirmée
             if order.state == 'confirmed':
                 for line in order.order_line_ids:
                     line.product_id.stock_quantity += line.quantity
@@ -100,41 +104,41 @@ class BikeSaleOrder(models.Model):
             order.state = 'cancelled'
 
     def action_set_draft(self):
-        """Reset order to draft"""
+        """Remet la commande en brouillon"""
         for order in self:
             if order.state not in ['cancelled']:
-                raise exceptions.ValidationError("Only cancelled orders can be reset to draft!")
+                raise exceptions.ValidationError(_("Seules les commandes annulées peuvent repasser en brouillon !"))
             order.state = 'draft'
 
 
 class BikeSaleOrderLine(models.Model):
     """
-    Sale order lines
+    Lignes de commande de vente
     """
     _name = "bike.sale.order.line"
-    _description = "Sale Order Line"
+    _description = "Ligne de commande"
     _order = "order_id, sequence, id"
 
-    sequence = fields.Integer(string="Sequence", default=10)
-    order_id = fields.Many2one('bike.sale.order', string="Order", required=True, ondelete='cascade')
-    product_id = fields.Many2one('bike.product', string="Product", required=True, ondelete='restrict')
+    sequence = fields.Integer(string="Séquence", default=10)
+    order_id = fields.Many2one('bike.sale.order', string="Commande", required=True, ondelete='cascade')
+    product_id = fields.Many2one('bike.product', string="Produit", required=True, ondelete='restrict')
 
     description = fields.Text(string="Description")
-    quantity = fields.Integer(string="Quantity", required=True, default=1)
-    unit_price = fields.Float(string="Unit Price", required=True)
-    discount = fields.Float(string="Discount (%)", default=0.0)
-    subtotal = fields.Float(string="Subtotal", compute='_compute_subtotal', store=True)
+    quantity = fields.Integer(string="Quantité", required=True, default=1)
+    unit_price = fields.Float(string="Prix unitaire", required=True)
+    discount = fields.Float(string="Remise (%)", default=0.0)
+    subtotal = fields.Float(string="Sous-total", compute='_compute_subtotal', store=True)
 
     @api.depends('quantity', 'unit_price', 'discount')
     def _compute_subtotal(self):
-        """Compute line subtotal"""
+        """Calcule le sous-total de la ligne"""
         for line in self:
             price = line.unit_price * (1 - (line.discount / 100))
             line.subtotal = line.quantity * price
 
     @api.onchange('product_id')
     def _onchange_product_id(self):
-        """Update unit price when product changes"""
+        """Met à jour le prix unitaire quand le produit change"""
         if self.product_id:
             self.unit_price = self.product_id.sale_price
             self.description = self.product_id.description

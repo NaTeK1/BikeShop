@@ -1,13 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <odoo>
 
-    <!-- Sale Order Tree View -->
+    <!-- Vue liste Commandes de vente -->
     <record id="view_bike_sale_order_tree" model="ir.ui.view">
         <field name="name">bike.sale.order.tree</field>
         <field name="model">bike.sale.order</field>
         <field name="arch" type="xml">
-            <list string="Sale Orders" decoration-info="state=='draft'"
-                  decoration-success="state=='done'" decoration-muted="state=='cancelled'">
+            <list string="Commandes de vente"
+                  decoration-info="state=='draft'"
+                  decoration-success="state=='done'"
+                  decoration-muted="state=='cancelled'">
                 <field name="name"/>
                 <field name="customer_id"/>
                 <field name="date"/>
@@ -18,29 +20,31 @@
         </field>
     </record>
 
-    <!-- Sale Order Form View -->
+    <!-- Vue formulaire Commande de vente -->
     <record id="view_bike_sale_order_form" model="ir.ui.view">
         <field name="name">bike.sale.order.form</field>
         <field name="model">bike.sale.order</field>
         <field name="arch" type="xml">
-            <form string="Sale Order">
+            <form string="Commande de vente">
                 <header>
-                    <button name="action_confirm" string="Confirm Order" type="object"
+                    <button name="action_confirm" string="Confirmer" type="object"
                             class="oe_highlight" invisible="state != 'draft'"/>
-                    <button name="action_done" string="Mark as Done" type="object"
+                    <button name="action_done" string="Marquer comme terminée" type="object"
                             class="oe_highlight" invisible="state != 'confirmed'"/>
-                    <button name="action_cancel" string="Cancel" type="object"
+                    <button name="action_cancel" string="Annuler" type="object"
                             invisible="state not in ['draft', 'confirmed']"/>
-                    <button name="action_set_draft" string="Set to Draft" type="object"
+                    <button name="action_set_draft" string="Remettre en brouillon" type="object"
                             invisible="state != 'cancelled'"/>
                     <field name="state" widget="statusbar" statusbar_visible="draft,confirmed,done"/>
                 </header>
+
                 <sheet>
                     <div class="oe_title">
                         <h1>
                             <field name="name" readonly="1"/>
                         </h1>
                     </div>
+
                     <group>
                         <group>
                             <field name="customer_id" readonly="state != 'draft'"/>
@@ -54,7 +58,7 @@
                     </group>
 
                     <notebook>
-                        <page string="Order Lines" name="order_lines">
+                        <page string="Lignes de commande" name="order_lines">
                             <field name="order_line_ids" readonly="state != 'draft'">
                                 <list editable="bottom">
                                     <field name="sequence" widget="handle"/>
@@ -66,6 +70,7 @@
                                     <field name="subtotal"/>
                                 </list>
                             </field>
+
                             <group class="oe_subtotal_footer oe_right">
                                 <field name="subtotal"/>
                                 <field name="tax_amount"/>
@@ -75,9 +80,10 @@
                                 <field name="total_amount" class="oe_subtotal_footer_separator"/>
                             </group>
                         </page>
-                        <page string="Other Info" name="other_info">
+
+                        <page string="Autres informations" name="other_info">
                             <group>
-                                <field name="notes" placeholder="Order notes..."/>
+                                <field name="notes" placeholder="Notes de commande..."/>
                             </group>
                         </page>
                     </notebook>
@@ -86,30 +92,30 @@
         </field>
     </record>
 
-    <!-- Sale Order Search View -->
+    <!-- Vue recherche Commandes de vente -->
     <record id="view_bike_sale_order_search" model="ir.ui.view">
         <field name="name">bike.sale.order.search</field>
         <field name="model">bike.sale.order</field>
         <field name="arch" type="xml">
-            <search string="Sale Orders">
+            <search string="Commandes de vente">
                 <field name="name"/>
                 <field name="customer_id"/>
             </search>
         </field>
     </record>
 
-    <!-- Sale Order Action -->
+    <!-- Action Commandes de vente -->
     <record id="action_bike_sale_order" model="ir.actions.act_window">
-        <field name="name">Sale Orders</field>
+        <field name="name">Commandes de vente</field>
         <field name="res_model">bike.sale.order</field>
         <field name="view_mode">list,form</field>
         <field name="search_view_id" ref="view_bike_sale_order_search"/>
         <field name="help" type="html">
             <p class="o_view_nocontent_smiling_face">
-                Create your first sale order
+                Créez votre première commande de vente
             </p>
             <p>
-                Manage customer orders with invoicing and stock management.
+                Gérez les commandes clients avec le suivi du paiement et la mise à jour du stock.
             </p>
         </field>
     </record>

@@ -1,86 +1,84 @@
-from odoo import models, fields, api, exceptions
+from odoo import models, fields, api, exceptions, _
 
 
 class BikeProduct(models.Model):
     """
-    Products: individual bikes, accessories, and parts
+    Produits : vélos, accessoires et pièces
     """
     _name = "bike.product"
-    _description = "Bike Product"
+    _description = "Produit vélo"
     _order = "name"
     _inherit = ["image.mixin"]
 
-    name = fields.Char(string="Product Name", required=True)
-    reference = fields.Char(string="Internal Reference", required=True, copy=False)
+    name = fields.Char(string="Nom du produit", required=True)
+    reference = fields.Char(string="Référence interne", required=True, copy=False)
     description = fields.Text(string="Description")
     image_1920 = fields.Image(string="Image", max_width=1920, max_height=1920)
 
-    # Product type
+    # Type de produit
     product_type = fields.Selection([
-        ('bike', 'Bike'),
-        ('accessory', 'Accessory'),
-        ('part', 'Part')
-    ], string="Product Type", required=True, default='bike')
+        ('bike', 'Vélo'),
+        ('accessory', 'Accessoire'),
+        ('part', 'Pièce')
+    ], string="Type de produit", required=True, default='bike')
 
-    # Category and model
-    category_id = fields.Many2one('bike.category', string="Category", required=True, ondelete='restrict')
-    bike_model_id = fields.Many2one('bike.model', string="Bike Model",
-                                     help="Link to bike model (for bikes only)")
+    # Catégorie et modèle
+    category_id = fields.Many2one('bike.category', string="Catégorie", required=True, ondelete='restrict')
+    bike_model_id = fields.Many2one(
+        'bike.model',
+        string="Modèle de vélo",
+        help="Lien vers le modèle (uniquement pour les vélos)"
+    )
 
-    # Pricing
-    sale_price = fields.Float(string="Sale Price", required=True, default=0.0)
-    cost_price = fields.Float(string="Cost Price", default=0.0)
+    # Prix
+    sale_price = fields.Float(string="Prix de vente", required=True, default=0.0)
+    cost_price = fields.Float(string="Prix de revient", default=0.0)
 
-    # Rental pricing
-    can_be_rented = fields.Boolean(string="Can be Rented", default=False)
-    rental_price_hourly = fields.Float(string="Hourly Rental Price")
-    rental_price_daily = fields.Float(string="Daily Rental Price")
-    rental_price_weekly = fields.Float(string="Weekly Rental Price")
-    rental_price_monthly = fields.Float(string="Monthly Rental Price")
+    # Tarifs de location
+    can_be_rented = fields.Boolean(string="Peut être loué", default=False)
+    rental_price_hourly = fields.Float(string="Prix de location horaire")
+    rental_price_daily = fields.Float(string="Prix de location journalier")
+    rental_price_weekly = fields.Float(string="Prix de location hebdomadaire")
+    rental_price_monthly = fields.Float(string="Prix de location mensuel")
 
-    # Stock management
-    stock_quantity = fields.Integer(string="Stock Quantity", default=0)
-    reserved_quantity = fields.Integer(string="Reserved Quantity", compute='_compute_reserved_quantity', store=True)
-    available_quantity = fields.Integer(string="Available Quantity", compute='_compute_available_quantity', store=True)
+    # Stock
+    stock_quantity = fields.Integer(string="Quantité en stock", default=0)
+    reserved_quantity = fields.Integer(string="Quantité réservée", compute='_compute_reserved_quantity', store=True)
+    available_quantity = fields.Integer(string="Quantité disponible", compute='_compute_available_quantity', store=True)
 
-    # Status
+    # Statut
     state = fields.Selection([
-        ('available', 'Available'),
-        ('rented', 'Rented'),
-        ('maintenance', 'In Maintenance'),
-        ('sold', 'Sold')
-    ], string="Status", default='available', compute='_compute_state', store=True)
+        ('available', 'Disponible'),
+        ('rented', 'Loué'),
+        ('maintenance', 'En maintenance'),
+        ('sold', 'Vendu')
+    ], string="Statut", default='available', compute='_compute_state', store=True)
 
-    active = fields.Boolean(string="Active", default=True)
-
-    # Integration with Odoo Stock (optional)
-    # Uncomment after installing stock/product module
-    # product_tmpl_id = fields.Many2one('product.template', string="Odoo Product Template",
-    #                                    help="Link to Odoo product for integration with Stock, Sales, etc.")
+    active = fields.Boolean(string="Actif", default=True)
 
     # Relations
-    rental_ids = fields.One2many('bike.rental', 'product_id', string="Rental History")
+    rental_ids = fields.One2many('bike.rental', 'product_id', string="Historique des locations")
 
     _sql_constraints = [
-        ('reference_unique', 'unique(reference)', 'Product reference must be unique!')
+        ('reference_unique', 'unique(reference)', 'La référence produit doit être unique !')
     ]
 
     @api.depends('rental_ids', 'rental_ids.state')
     def _compute_reserved_quantity(self):
-        """Compute quantity reserved by active rentals"""
+        """Calcule la quantité réservée par des locations actives"""
         for product in self:
             active_rentals = product.rental_ids.filtered(lambda r: r.state in ['draft', 'ongoing'])
             product.reserved_quantity = len(active_rentals)
 
     @api.depends('stock_quantity', 'reserved_quantity')
     def _compute_available_quantity(self):
-        """Compute available quantity (stock - reserved)"""
+        """Calcule la quantité disponible (stock - réservée)"""
         for product in self:
             product.available_quantity = product.stock_quantity - product.reserved_quantity
 
     @api.depends('rental_ids', 'rental_ids.state', 'stock_quantity')
     def _compute_state(self):
-        """Compute product state based on rentals and stock"""
+        """Calcule l’état selon les locations et le stock"""
         for product in self:
             if product.stock_quantity == 0:
                 product.state = 'sold'
@@ -91,20 +89,20 @@ class BikeProduct(models.Model):
 
     @api.constrains('stock_quantity')
     def _check_stock_quantity(self):
-        """Ensure stock quantity is not negative"""
+        """Empêche un stock négatif"""
         for product in self:
             if product.stock_quantity < 0:
-                raise exceptions.ValidationError("Stock quantity cannot be negative!")
+                raise exceptions.ValidationError(_("La quantité en stock ne peut pas être négative !"))
 
     @api.constrains('sale_price', 'cost_price')
     def _check_prices(self):
-        """Ensure prices are positive"""
+        """Empêche des prix négatifs"""
         for product in self:
             if product.sale_price < 0 or product.cost_price < 0:
-                raise exceptions.ValidationError("Prices must be positive!")
+                raise exceptions.ValidationError(_("Les prix doivent être positifs !"))
 
     @api.constrains('image_1920')
     def _check_image_required(self):
         for product in self:
             if not product.image_1920:
-                raise exceptions.ValidationError("Please add an image for each product.")
+                raise exceptions.ValidationError(_("Veuillez ajouter une image pour chaque produit."))

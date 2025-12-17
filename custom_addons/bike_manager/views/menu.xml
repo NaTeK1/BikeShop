@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <odoo>
 
-    <!-- MAIN MENU -->
+    <!-- MENU PRINCIPAL -->
     <menuitem
         id="menu_bike_shop_root"
         name="Bike Shop"
@@ -9,17 +9,17 @@
         web_icon="bike_manager,static/description/icon.png"
     />
 
-    <!-- CATALOG MENU -->
+    <!-- MENU CATALOGUE -->
     <menuitem
         id="menu_bike_shop_catalog"
-        name="Catalog"
+        name="Catalogue"
         parent="menu_bike_shop_root"
         sequence="10"
     />
 
     <menuitem
         id="menu_bike_categories"
-        name="Categories"
+        name="Catégories"
         parent="menu_bike_shop_catalog"
         action="action_bike_category"
         sequence="10"
@@ -27,7 +27,7 @@
 
     <menuitem
         id="menu_bike_models"
-        name="Bike Models"
+        name="Modèles de vélos"
         parent="menu_bike_shop_catalog"
         action="action_bike_model"
         sequence="20"
@@ -35,64 +35,64 @@
 
     <menuitem
         id="menu_bike_products"
-        name="Products"
+        name="Produits"
         parent="menu_bike_shop_catalog"
         action="action_bike_product"
         sequence="30"
     />
 
-    <!-- SALES MENU -->
+    <!-- MENU VENTES -->
     <menuitem
         id="menu_bike_shop_sales"
-        name="Sales"
+        name="Ventes"
         parent="menu_bike_shop_root"
         sequence="20"
     />
 
     <menuitem
         id="menu_bike_sale_orders"
-        name="Sale Orders"
+        name="Commandes de vente"
         parent="menu_bike_shop_sales"
         action="action_bike_sale_order"
         sequence="10"
     />
 
-    <!-- RENTALS MENU -->
+    <!-- MENU LOCATIONS -->
     <menuitem
         id="menu_bike_shop_rentals"
-        name="Rentals"
+        name="Locations"
         parent="menu_bike_shop_root"
         sequence="30"
     />
 
     <menuitem
         id="menu_bike_rentals"
-        name="Rental Contracts"
+        name="Contrats de location"
         parent="menu_bike_shop_rentals"
         action="action_bike_rental"
         sequence="10"
     />
 
-    <!-- CUSTOMERS MENU -->
+    <!-- MENU CLIENTS -->
     <menuitem
         id="menu_bike_shop_customers"
-        name="Customers"
+        name="Clients"
         parent="menu_bike_shop_root"
         sequence="40"
     />
 
     <menuitem
         id="menu_bike_customers"
-        name="Customers"
+        name="Clients"
         parent="menu_bike_shop_customers"
         action="action_bike_customer"
         sequence="10"
     />
 
-    <!-- REPORTING MENU -->
+    <!-- MENU RAPPORTS -->
     <menuitem
         id="menu_bike_shop_reporting"
-        name="Reporting"
+        name="Rapports"
         parent="menu_bike_shop_root"
         sequence="50"
     />

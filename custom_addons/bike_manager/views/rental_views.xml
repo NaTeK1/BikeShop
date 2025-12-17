@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <odoo>
 
-    <!-- Rental Tree View -->
+    <!-- Vue liste Locations -->
     <record id="view_bike_rental_tree" model="ir.ui.view">
         <field name="name">bike.rental.tree</field>
         <field name="model">bike.rental</field>
         <field name="arch" type="xml">
-            <list string="Rentals" decoration-info="state=='draft'"
+            <list string="Locations" decoration-info="state=='draft'"
                   decoration-warning="state=='ongoing'"
                   decoration-success="state=='returned'"
                   decoration-muted="state=='cancelled'">
@@ -23,20 +23,20 @@
         </field>
     </record>
 
-    <!-- Rental Form View -->
+    <!-- Vue formulaire Location -->
     <record id="view_bike_rental_form" model="ir.ui.view">
         <field name="name">bike.rental.form</field>
         <field name="model">bike.rental</field>
         <field name="arch" type="xml">
-            <form string="Rental">
+            <form string="Location">
                 <header>
-                    <button name="action_start_rental" string="Start Rental" type="object"
+                    <button name="action_start_rental" string="Démarrer la location" type="object"
                             class="oe_highlight" invisible="state != 'draft'"/>
-                    <button name="action_return_bike" string="Return Bike" type="object"
+                    <button name="action_return_bike" string="Retour du vélo" type="object"
                             class="oe_highlight" invisible="state != 'ongoing'"/>
-                    <button name="action_cancel" string="Cancel" type="object"
+                    <button name="action_cancel" string="Annuler" type="object"
                             invisible="state not in ['draft', 'ongoing']"/>
-                    <button name="action_set_draft" string="Set to Draft" type="object"
+                    <button name="action_set_draft" string="Remettre en brouillon" type="object"
                             invisible="state != 'cancelled'"/>
                     <field name="state" widget="statusbar" statusbar_visible="draft,ongoing,returned"/>
                 </header>
@@ -57,7 +57,7 @@
                         </group>
                     </group>
 
-                    <group string="Rental Period">
+                    <group string="Période de location">
                         <group>
                             <field name="start_date" readonly="state not in ['draft']"/>
                             <field name="end_date" readonly="state not in ['draft']"/>
@@ -68,7 +68,7 @@
                         </group>
                     </group>
 
-                    <group string="Pricing">
+                    <group string="Tarification">
                         <group>
                             <field name="total_price"/>
                             <field name="deposit_amount"/>
@@ -79,7 +79,7 @@
                         </group>
                     </group>
 
-                    <group string="Payment">
+                    <group string="Paiement">
                         <group>
                             <field name="payment_method"/>
                             <field name="is_paid"/>
@@ -90,15 +90,15 @@
                     </group>
 
                     <notebook>
-                        <page string="Conditions" name="conditions">
+                        <page string="État du vélo" name="conditions">
                             <group>
-                                <field name="condition_on_pickup" placeholder="Describe bike condition on pickup..."/>
-                                <field name="condition_on_return" placeholder="Describe bike condition on return..."
+                                <field name="condition_on_pickup" placeholder="Décrivez l’état du vélo lors du retrait..."/>
+                                <field name="condition_on_return" placeholder="Décrivez l’état du vélo lors du retour..."
                                        invisible="state not in ['returned']"/>
                             </group>
                         </page>
                         <page string="Notes" name="notes">
-                            <field name="notes" placeholder="Rental notes..."/>
+                            <field name="notes" placeholder="Notes de location..."/>
                         </page>
                     </notebook>
                 </sheet>
@@ -106,12 +106,12 @@
         </field>
     </record>
 
-    <!-- Rental Calendar View -->
+    <!-- Vue calendrier Locations -->
     <record id="view_bike_rental_calendar" model="ir.ui.view">
         <field name="name">bike.rental.calendar</field>
         <field name="model">bike.rental</field>
         <field name="arch" type="xml">
-            <calendar string="Rentals" date_start="start_date" date_stop="end_date"
+            <calendar string="Locations" date_start="start_date" date_stop="end_date"
                       color="product_id" mode="month">
                 <field name="customer_id"/>
                 <field name="product_id"/>
@@ -119,7 +119,7 @@
         </field>
     </record>
 
-    <!-- Rental Search View -->
+    <!-- Vue recherche Locations -->
     <record id="view_bike_rental_search" model="ir.ui.view">
         <field name="name">bike.rental.search</field>
         <field name="model">bike.rental</field>
@@ -132,18 +132,18 @@
         </field>
     </record>
 
-    <!-- Rental Action -->
+    <!-- Action Locations -->
     <record id="action_bike_rental" model="ir.actions.act_window">
-        <field name="name">Rentals</field>
+        <field name="name">Locations</field>
         <field name="res_model">bike.rental</field>
         <field name="view_mode">list,form,calendar</field>
         <field name="search_view_id" ref="view_bike_rental_search"/>
         <field name="help" type="html">
             <p class="o_view_nocontent_smiling_face">
-                Create your first rental
+                Créez votre première location
             </p>
             <p>
-                Manage bike rentals with pricing, availability, and contracts.
+                Gérez les locations de vélos : tarifs, disponibilités et contrats.
             </p>
         </field>
     </record>
