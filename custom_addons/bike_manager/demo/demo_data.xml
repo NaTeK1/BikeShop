@@ -189,7 +189,8 @@
 
     <!-- ===== Clients ===== -->
     <record id="customer_jean_dupont" model="bike.customer">
-        <field name="name">Jean Dupont</field>
+        <field name="first_name">Jean</field>
+        <field name="last_name">Dupont</field>
         <field name="email">jean.dupont@example.com</field>
         <field name="phone">+32 2 123 45 67</field>
         <field name="mobile">+32 470 11 22 33</field>
@@ -197,12 +198,11 @@
         <field name="zip">1000</field>
         <field name="city">Bruxelles</field>
         <field name="country_id" ref="base.be"/>
-        <field name="notes">Client fidèle.</field>
-        <field name="active">True</field>
     </record>
 
     <record id="customer_marie_lambert" model="bike.customer">
-        <field name="name">Marie Lambert</field>
+        <field name="first_name">Marie</field>
+        <field name="last_name">Lambert</field>
         <field name="email">marie.lambert@example.com</field>
         <field name="phone">+32 2 234 56 78</field>
         <field name="mobile">+32 471 22 33 44</field>
@@ -210,12 +210,11 @@
         <field name="zip">1050</field>
         <field name="city">Bruxelles</field>
         <field name="country_id" ref="base.be"/>
-        <field name="notes">Préférence : vélos électriques.</field>
-        <field name="active">True</field>
     </record>
 
     <record id="customer_lucas_martin" model="bike.customer">
-        <field name="name">Lucas Martin</field>
+        <field name="first_name">Lucas</field>
+        <field name="last_name">Martin</field>
         <field name="email">lucas.martin@example.com</field>
         <field name="phone">+32 2 345 67 89</field>
         <field name="mobile">+32 472 33 44 55</field>
@@ -223,8 +222,6 @@
         <field name="zip">1040</field>
         <field name="city">Bruxelles</field>
         <field name="country_id" ref="base.be"/>
-        <field name="notes">Loue régulièrement des VTT.</field>
-        <field name="active">True</field>
     </record>
 
     <!-- ===== Commandes de vente ===== -->

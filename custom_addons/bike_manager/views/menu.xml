@@ -82,11 +82,19 @@
     />
 
     <menuitem
-        id="menu_bike_customers"
-        name="Clients"
+        id="menu_bike_customers_detail"
+        name="Détails clients"
         parent="menu_bike_shop_customers"
         action="action_bike_customer"
         sequence="10"
+    />
+
+    <menuitem
+        id="menu_bike_customers_stats"
+        name="Statistiques clients"
+        parent="menu_bike_shop_customers"
+        action="action_bike_customer_stats"
+        sequence="20"
     />
 
     <!-- MENU RAPPORTS -->
