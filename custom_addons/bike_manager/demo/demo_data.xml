@@ -67,7 +67,7 @@
 
     <!-- ===== Produits (Vélos) ===== -->
     <record id="product_domane_black" model="bike.product">
-        <field name="name">Trek Domane SL 6 — Noir</field>
+        <field name="name">Trek Domane SL 6 — Blanc</field>
         <field name="reference">BIKE-TRK-DOM-001</field>
         <field name="product_type">bike</field>
         <field name="category_id" ref="cat_velos_route"/>
@@ -85,7 +85,7 @@
     </record>
 
     <record id="product_marlin_red" model="bike.product">
-        <field name="name">Trek Marlin 7 — Rouge</field>
+        <field name="name">Trek Marlin 7 — Gris</field>
         <field name="reference">BIKE-TRK-MAR-001</field>
         <field name="product_type">bike</field>
         <field name="category_id" ref="cat_vtt"/>
@@ -103,7 +103,7 @@
     </record>
 
     <record id="product_allant_grey" model="bike.product">
-        <field name="name">Trek Allant+ 7 — Gris</field>
+        <field name="name">Trek Allant+ 7 — Noir</field>
         <field name="reference">BIKE-TRK-ALL-001</field>
         <field name="product_type">bike</field>
         <field name="category_id" ref="cat_velos_electriques"/>
@@ -293,7 +293,6 @@
         <field name="product_id" ref="product_marlin_red"/>
         <field name="start_date">2025-12-01 10:00:00</field>
         <field name="end_date">2025-12-03 10:00:00</field>
-        <field name="actual_return_date">2025-12-03 10:15:00</field>
         <field name="pricing_type">daily</field>
         <field name="unit_price">50.00</field>
         <field name="deposit_amount">200.00</field>

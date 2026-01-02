@@ -1,6 +1,6 @@
 {
     "name": "Bike Shop",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "summary": "Gestion des ventes et des locations de vélos",
     "description": """
 Bike Shop

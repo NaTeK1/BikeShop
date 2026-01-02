@@ -6,19 +6,20 @@
         <field name="name">bike.rental.tree</field>
         <field name="model">bike.rental</field>
         <field name="arch" type="xml">
-            <list string="Locations" decoration-info="state=='draft'"
+            <list string="Locations"
+                  decoration-info="state=='draft'"
                   decoration-warning="state=='ongoing'"
                   decoration-success="state=='returned'"
                   decoration-muted="state=='cancelled'">
-                <field name="name"/>
-                <field name="customer_id"/>
-                <field name="product_id"/>
-                <field name="start_date"/>
-                <field name="end_date"/>
-                <field name="pricing_type"/>
-                <field name="total_amount"/>
-                <field name="state"/>
-                <field name="is_paid"/>
+                <field name="name" width="11"/>
+                <field name="customer_id" width="11"/>
+                <field name="product_id" width="11"/>
+                <field name="start_date" width="11"/>
+                <field name="end_date" width="11"/>
+                <field name="pricing_type" width="11"/>
+                <field name="total_amount" width="11"/>
+                <field name="state" width="11"/>
+                <field name="is_paid" width="11"/>
             </list>
         </field>
     </record>
@@ -40,62 +41,112 @@
                             invisible="state != 'cancelled'"/>
                     <field name="state" widget="statusbar" statusbar_visible="draft,ongoing,returned"/>
                 </header>
+
                 <sheet>
+                    <!-- TITRE -->
                     <div class="oe_title">
                         <h1>
-                            <field name="name" readonly="1"/>
+                            <span invisible="name != 'New'">Nouvelle location</span>
+                            <field name="name" readonly="1" invisible="name == 'New'"/>
                         </h1>
                     </div>
-                    <group>
+
+                    <!-- CLIENT + VÉLO -->
+                    <group string="DÉTAIL">
                         <group>
                             <field name="customer_id" readonly="state != 'draft'"/>
                             <field name="product_id" readonly="state != 'draft'"/>
                         </group>
+                    </group>
+
+                    <!-- PÉRIODE -->
+                    <group string="Période">
                         <group>
+                            <!-- 1) Choix type -->
                             <field name="pricing_type" readonly="state != 'draft'"/>
-                            <field name="unit_price"/>
+
+                            <!-- 2) Durée selon type (dropdowns) -->
+                            <field name="hours_qty"
+                                   string="Durée (heures)"
+                                   readonly="state != 'draft'"
+                                   invisible="pricing_type != 'hourly'"/>
+                            <field name="days_qty"
+                                   string="Durée (jours)"
+                                   readonly="state != 'draft'"
+                                   invisible="pricing_type != 'daily'"/>
+                            <field name="weeks_qty"
+                                   string="Durée (semaines)"
+                                   readonly="state != 'draft'"
+                                   invisible="pricing_type != 'weekly'"/>
+                            <field name="months_qty"
+                                   string="Durée (mois)"
+                                   readonly="state != 'draft'"
+                                   invisible="pricing_type != 'monthly'"/>
+
+                            <field name="start_date" readonly="state != 'draft'"/>
+                            <field name="end_date" readonly="1"/>
                         </group>
                     </group>
 
-                    <group string="Période de location">
-                        <group>
-                            <field name="start_date" readonly="state not in ['draft']"/>
-                            <field name="end_date" readonly="state not in ['draft']"/>
-                        </group>
-                        <group>
-                            <field name="duration"/>
-                            <field name="actual_return_date" invisible="state != 'returned'"/>
-                        </group>
-                    </group>
-
+                    <!-- TARIFICATION -->
                     <group string="Tarification">
                         <group>
-                            <field name="total_price"/>
-                            <field name="deposit_amount"/>
-                            <field name="additional_charges"/>
+                            <!-- Prix unitaire avec suffixe selon le type -->
+                            <label for="unit_price" string="Prix unitaire - Horaire" invisible="pricing_type != 'hourly'"/>
+                            <label for="unit_price" string="Prix unitaire - Journalier" invisible="pricing_type != 'daily'"/>
+                            <label for="unit_price" string="Prix unitaire - Hebdomadaire" invisible="pricing_type != 'weekly'"/>
+                            <label for="unit_price" string="Prix unitaire - Mensuel" invisible="pricing_type != 'monthly'"/>
+                            <field name="unit_price" nolabel="1" readonly="state != 'draft'"/>
+
+                            <!-- Caution -->
+                            <label for="deposit_amount" string="Prix caution"/>
+                            <field name="deposit_amount" nolabel="1" readonly="state != 'draft'"/>
+
+                            <!-- Accessoires + frais manuels (uniquement en cours) -->
+                            <field name="extra_product_ids"
+                                widget="many2many_tags"
+                                domain="[('can_be_rented','=',False)]"
+                                invisible="state != 'ongoing'"/>
+                            <field name="extras_total" readonly="1" invisible="state != 'ongoing'"/>
+                            <field name="manual_extra_amount" invisible="state != 'ongoing'"/>
+
+                            <!-- Total -->
+                            <label for="total_amount" string="Prix total"/>
+                            <field name="total_amount" nolabel="1" readonly="1" class="oe_subtotal_footer_separator"/>
                         </group>
-                        <group>
-                            <field name="total_amount" class="oe_subtotal_footer_separator"/>
+
+                        <!-- Résumé des frais (uniquement retournée) -->
+                        <group string="Frais supplémentaires" invisible="state != 'returned'">
+                            <group>
+                                <field name="extras_total" readonly="1"/>
+                                <field name="manual_extra_amount" readonly="1"/>
+                                <field name="extras_grand_total" readonly="1" class="oe_subtotal_footer_separator"/>
+                            </group>
                         </group>
                     </group>
 
+                    <!-- PAIEMENT -->
                     <group string="Paiement">
                         <group>
-                            <field name="payment_method"/>
-                            <field name="is_paid"/>
-                        </group>
-                        <group>
+                            <field name="payment_method" readonly="state == 'cancelled'"/>
+                            <field name="is_paid" invisible="state != 'returned'"/>
                             <field name="deposit_returned" invisible="state != 'returned'"/>
                         </group>
                     </group>
 
-                    <group string="État du vélo" name="conditions">
+                    <!-- ÉTAT DU VÉLO -->
+                    <group string="État du vélo">
                         <group>
-                            <field name="condition_on_pickup" placeholder="Décrivez l’état du vélo lors du retrait..."/>
-                            <field name="condition_on_return" placeholder="Décrivez l’état du vélo lors du retour..."
-                                    invisible="state not in ['returned']"/>
+                            <field name="condition_on_pickup"
+                                   placeholder="Décrivez l’état du vélo lors du retrait..."
+                                   readonly="state != 'draft'"/>
+                            <field name="condition_on_return"
+                                   placeholder="Décrivez l’état du vélo lors du retour..."
+                                   invisible="state != 'returned'"/>
                         </group>
                     </group>
+
+                    <field name="invoice_id" invisible="1"/>
                 </sheet>
 
                 <!-- Facturation -->
@@ -113,15 +164,8 @@
                             <span class="o_stat_text">Voir facture</span>
                         </div>
                     </button>
-                    <!-- Bouton Imprimer désactivé pour l'instant
-                    <button name="action_print_invoice" type="object" class="oe_stat_button"
-                            icon="fa-print" invisible="not invoice_id">
-                        <div class="o_stat_info">
-                            <span class="o_stat_text">Imprimer</span>
-                        </div>
-                    </button> -->
+                    <!-- Imprimer désactivé -->
                 </div>
-                <field name="invoice_id" invisible="1"/>
 
             </form>
         </field>

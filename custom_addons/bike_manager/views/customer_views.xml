@@ -36,8 +36,8 @@
                     </div>
 
                     <group string="Identité">
-                        <field name="first_name" required="1" placeholder="Ex: Michal"/>
-                        <field name="last_name" required="1" placeholder="Ex: Kwiatkowski"/>
+                        <field name="first_name" required="1" placeholder="Ex: Alain"/>
+                        <field name="last_name" required="1" placeholder="Ex: Dubois"/>
                     </group>
 
                     <group string="Contact">
