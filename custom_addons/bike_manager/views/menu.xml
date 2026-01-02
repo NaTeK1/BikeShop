@@ -57,35 +57,19 @@
         sequence="10"
     />
 
-    <!-- MENU LOCATIONS -->
-    <menuitem
-        id="menu_bike_shop_rentals"
-        name="Locations"
-        parent="menu_bike_shop_root"
-        sequence="30"
-    />
-
-    <menuitem
-        id="menu_bike_rentals"
-        name="Contrats de location"
-        parent="menu_bike_shop_rentals"
-        action="action_bike_rental"
-        sequence="10"
-    />
-
     <!-- MENU CLIENTS -->
     <menuitem
         id="menu_bike_shop_customers"
         name="Clients"
         parent="menu_bike_shop_root"
-        sequence="40"
+        sequence="30"
     />
 
     <menuitem
-        id="menu_bike_customers_detail"
+        id="menu_bike_customers_details"
         name="Détails clients"
         parent="menu_bike_shop_customers"
-        action="action_bike_customer"
+        action="action_bike_customer_details"
         sequence="10"
     />
 
@@ -95,6 +79,22 @@
         parent="menu_bike_shop_customers"
         action="action_bike_customer_stats"
         sequence="20"
+    />
+
+    <!-- MENU LOCATIONS -->
+    <menuitem
+        id="menu_bike_shop_rentals"
+        name="Locations"
+        parent="menu_bike_shop_root"
+        sequence="40"
+    />
+
+    <menuitem
+        id="menu_bike_rentals"
+        name="Contrats de location"
+        parent="menu_bike_shop_rentals"
+        action="action_bike_rental"
+        sequence="10"
     />
 
     <!-- MENU RAPPORTS -->

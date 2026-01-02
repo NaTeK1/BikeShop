@@ -2,15 +2,15 @@
 <odoo>
 
     <!-- ========================= -->
-    <!--   CLIENTS - DETAIL VIEW   -->
+    <!--   CLIENTS - DETAILS VIEW   -->
     <!-- ========================= -->
 
-    <!-- Vue liste (Détail client) -->
-    <record id="view_bike_customer_tree_detail" model="ir.ui.view">
-        <field name="name">bike.customer.tree.detail</field>
+    <!-- Liste (Détails clients) -->
+    <record id="view_bike_customer_tree_details" model="ir.ui.view">
+        <field name="name">bike.customer.tree.details</field>
         <field name="model">bike.customer</field>
         <field name="arch" type="xml">
-            <list string="Détail client">
+            <list string="Détails clients">
                 <field name="name" width="14"/>
                 <field name="email" width="14"/>
                 <field name="phone" width="14"/>
@@ -22,22 +22,19 @@
         </field>
     </record>
 
-    <!-- Formulaire (Nouveau / Détail client) : STRUCTURÉ + champs obligatoires visibles -->
-    <record id="view_bike_customer_form_detail" model="ir.ui.view">
-        <field name="name">bike.customer.form.detail</field>
+    <!-- Form (Détails clients) -->
+    <record id="view_bike_customer_form_details" model="ir.ui.view">
+        <field name="name">bike.customer.form.details</field>
         <field name="model">bike.customer</field>
         <field name="arch" type="xml">
             <form string="Client">
                 <sheet>
-
-                    <div class="oe_title" invisible="not name">
+                    <div class="oe_title">
                         <h1>
                             <field name="name" readonly="1"/>
                         </h1>
                     </div>
 
-
-                    <!-- Obligatoire : Prénom, Nom, Email, Téléphone, Rue, Code postal, Ville, Pays -->
                     <group string="Identité">
                         <field name="first_name" required="1" placeholder="Ex: Michal"/>
                         <field name="last_name" required="1" placeholder="Ex: Kwiatkowski"/>
@@ -61,45 +58,28 @@
         </field>
     </record>
 
-    <!-- Recherche -->
-    <record id="view_bike_customer_search" model="ir.ui.view">
-        <field name="name">bike.customer.search</field>
-        <field name="model">bike.customer</field>
-        <field name="arch" type="xml">
-            <search string="Clients">
-                <field name="name"/>
-                <field name="email"/>
-                <field name="phone"/>
-                <field name="city"/>
-                <field name="country_id"/>
-            </search>
-        </field>
-    </record>
-
-    <!-- Action - Détail client -->
-    <record id="action_bike_customer" model="ir.actions.act_window">
+    <!-- Action - Détails -->
+    <record id="action_bike_customer_details" model="ir.actions.act_window">
         <field name="name">Détails clients</field>
         <field name="res_model">bike.customer</field>
         <field name="view_mode">list,form</field>
-        <field name="search_view_id" ref="view_bike_customer_search"/>
         <field name="view_ids" eval="[
             (5, 0, 0),
-            (0, 0, {'view_mode': 'list', 'view_id': ref('view_bike_customer_tree_detail')}),
-            (0, 0, {'view_mode': 'form', 'view_id': ref('view_bike_customer_form_detail')})
+            (0, 0, {'view_mode': 'list', 'view_id': ref('view_bike_customer_tree_details')}),
+            (0, 0, {'view_mode': 'form', 'view_id': ref('view_bike_customer_form_details')})
         ]"/>
     </record>
 
-
     <!-- ========================= -->
-    <!--   CLIENTS - STATS TABLE   -->
+    <!--   CLIENTS - STATS VIEW    -->
     <!-- ========================= -->
 
-    <!-- Tableau stats : Nom + nb ventes + nb locations + total ventes + total locations -->
+    <!-- Liste (Stats clients) -->
     <record id="view_bike_customer_tree_stats" model="ir.ui.view">
         <field name="name">bike.customer.tree.stats</field>
         <field name="model">bike.customer</field>
         <field name="arch" type="xml">
-            <list string="Statistiques clients" create="0" edit="0" delete="0">
+            <list string="Statistiques clients">
                 <field name="name" width="20"/>
                 <field name="sale_count" width="20"/>
                 <field name="rental_count" width="20"/>
@@ -109,15 +89,45 @@
         </field>
     </record>
 
-    <!-- Action - Statistiques clients (LIST uniquement) -->
+
+    <!-- Form (Stats clients) -->
+    <record id="view_bike_customer_form_stats" model="ir.ui.view">
+        <field name="name">bike.customer.form.stats</field>
+        <field name="model">bike.customer</field>
+        <field name="arch" type="xml">
+            <form string="Statistiques client">
+                <sheet>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="name" readonly="1"/>
+                        </h1>
+                    </div>
+
+                    <group string="Identité">
+                        <field name="first_name" readonly="1"/>
+                        <field name="last_name" readonly="1"/>
+                    </group>
+
+                    <group string="Statistiques">
+                        <field name="sale_count" readonly="1"/>
+                        <field name="rental_count" readonly="1"/>
+                        <field name="total_sales_amount" readonly="1"/>
+                        <field name="total_rental_amount" readonly="1"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Action - Stats -->
     <record id="action_bike_customer_stats" model="ir.actions.act_window">
         <field name="name">Statistiques clients</field>
         <field name="res_model">bike.customer</field>
-        <field name="view_mode">list</field>
-        <field name="search_view_id" ref="view_bike_customer_search"/>
+        <field name="view_mode">list,form</field>
         <field name="view_ids" eval="[
             (5, 0, 0),
-            (0, 0, {'view_mode': 'list', 'view_id': ref('view_bike_customer_tree_stats')})
+            (0, 0, {'view_mode': 'list', 'view_id': ref('view_bike_customer_tree_stats')}),
+            (0, 0, {'view_mode': 'form', 'view_id': ref('view_bike_customer_form_stats')})
         ]"/>
     </record>
 

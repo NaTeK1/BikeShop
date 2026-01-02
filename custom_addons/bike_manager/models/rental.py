@@ -15,7 +15,7 @@ class BikeRental(models.Model):
     customer_id = fields.Many2one('bike.customer', string="Client", required=True, ondelete='restrict')
     product_id = fields.Many2one(
         'bike.product',
-        string="Vélo / Produit",
+        string="Vélo",
         required=True,
         ondelete='restrict',
         domain="[('can_be_rented', '=', True)]"

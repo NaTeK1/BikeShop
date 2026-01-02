@@ -16,3 +16,23 @@
   object-fit:cover;
   border-radius:8px;
 }
+
+/* Header + cellules */
+.o_list_view .o_list_table thead th,
+.o_list_view .o_list_table thead th * ,
+.o_list_view .o_list_table tbody td {
+  text-align: left !important;
+}
+
+/* Les titres cliquables (tri) */
+.o_list_view .o_list_table thead th.o_column_sortable,
+.o_list_view .o_list_table thead th.o_column_sortable > div,
+.o_list_view .o_list_table thead th .o_column_sortable {
+  text-align: left !important;
+  justify-content: flex-start !important; /* si c'est en flex */
+}
+
+/* (optionnel) si le header est en flex */
+.o_list_view .o_list_table thead th > div {
+  justify-content: flex-start !important;
+}

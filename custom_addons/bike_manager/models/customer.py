@@ -1,5 +1,9 @@
-from odoo import models, fields, api
+# -*- coding: utf-8 -*-
+import re
+
+from odoo import models, fields, api, _
 from odoo.exceptions import ValidationError
+from odoo.tools import email_normalize
 
 
 class BikeCustomer(models.Model):
@@ -17,19 +21,19 @@ class BikeCustomer(models.Model):
     name = fields.Char(string="Nom complet", required=True)
 
     # ----------------------------
-    # Coordonnées (obligatoires via contraintes + UI)
+    # Coordonnées
     # ----------------------------
     email = fields.Char(string="E-mail")
     phone = fields.Char(string="Téléphone")
     mobile = fields.Char(string="GSM")
 
+    # Adresse
     street = fields.Char(string="Rue")
     street2 = fields.Char(string="Complément d’adresse")
     zip = fields.Char(string="Code postal")
     city = fields.Char(string="Ville")
     country_id = fields.Many2one("res.country", string="Pays")
 
-    # Champs existants (tu peux les garder, mais on ne les affiche plus dans le form)
     notes = fields.Text(string="Notes")
     active = fields.Boolean(string="Actif", default=True)
 
@@ -40,7 +44,7 @@ class BikeCustomer(models.Model):
     rental_ids = fields.One2many("bike.rental", "customer_id", string="Locations")
 
     # ----------------------------
-    # Statistiques (table "Stats clients")
+    # Statistiques
     # ----------------------------
     sale_count = fields.Integer(string="Nombre de ventes", compute="_compute_stats", store=True)
     rental_count = fields.Integer(string="Nombre de locations", compute="_compute_stats", store=True)
@@ -48,7 +52,12 @@ class BikeCustomer(models.Model):
     total_rental_amount = fields.Float(string="Total locations", compute="_compute_stats", store=True)
 
     # ----------------------------
-    # Helpers
+    # Facturation / lien res.partner (optionnel)
+    # ----------------------------
+    partner_id = fields.Many2one("res.partner", string="Contact Odoo", readonly=True, copy=False)
+
+    # ----------------------------
+    # Helpers nom complet
     # ----------------------------
     def _build_full_name(self):
         self.ensure_one()
@@ -84,7 +93,7 @@ class BikeCustomer(models.Model):
         return res
 
     # ----------------------------
-    # Validation (obligatoire côté serveur aussi)
+    # Validation (présence)
     # ----------------------------
     @api.constrains("first_name", "last_name", "email", "phone", "street", "zip", "city", "country_id")
     def _check_required_fields(self):
@@ -111,6 +120,70 @@ class BikeCustomer(models.Model):
                 raise ValidationError("Champs obligatoires manquants : " + ", ".join(missing))
 
     # ----------------------------
+    # Validation formats (email/tel/gsm/zip)
+    # ----------------------------
+    def _validate_email(self, value):
+        """Email conforme (utilise les outils Odoo)."""
+        if not value:
+            return
+        normalized = email_normalize(value)
+        if not normalized:
+            raise ValidationError(_("E-mail invalide : %s") % value)
+
+    def _validate_phone_like(self, label, value):
+        """
+        Téléphone/GSM : tolère +, espaces, -, (), .
+        Vérifie surtout que le nombre de chiffres est plausible.
+        """
+        if not value:
+            return
+        cleaned = re.sub(r"[^\d+]", "", value)  # garde chiffres et '+'
+        digits = re.sub(r"\D", "", cleaned)
+
+        # règles simples anti-n'importe quoi
+        if len(digits) < 8 or len(digits) > 15:
+            raise ValidationError(_("%s invalide : %s") % (label, value))
+        if cleaned.count("+") > 1 or (cleaned.count("+") == 1 and not cleaned.startswith("+")):
+            raise ValidationError(_("%s invalide : %s") % (label, value))
+
+    def _validate_zip(self, value, country):
+        """BE = 4 chiffres. Autres pays = chiffres uniquement (3 à 10)."""
+        if not value:
+            return
+
+        v = value.strip()
+
+        # Belgique : 4 chiffres
+        if country and country.code == "BE":
+            if not re.fullmatch(r"\d{4}", v):
+                raise ValidationError(_("Code postal belge invalide (4 chiffres) : %s") % value)
+            return
+
+        # Autres pays : uniquement chiffres (3 à 10)
+        if not re.fullmatch(r"\d{3,10}", v):
+            raise ValidationError(_("Code postal invalide (chiffres uniquement) : %s") % value)
+
+
+    @api.constrains("email", "phone", "mobile", "zip", "country_id")
+    def _check_format_fields(self):
+        for rec in self:
+            rec._validate_email(rec.email)
+            rec._validate_phone_like(_("Téléphone"), rec.phone)
+            rec._validate_phone_like(_("GSM"), rec.mobile)
+            rec._validate_zip(rec.zip, rec.country_id)
+
+    # ----------------------------
+    # Normalisation email (UI)
+    # ----------------------------
+    @api.onchange("email")
+    def _onchange_email_normalize(self):
+        for rec in self:
+            if rec.email:
+                normalized = email_normalize(rec.email)
+                if normalized:
+                    rec.email = normalized
+
+    # ----------------------------
     # Stats computation
     # ----------------------------
     @api.depends(
@@ -119,7 +192,6 @@ class BikeCustomer(models.Model):
     )
     def _compute_stats(self):
         for customer in self:
-            # adapte si tes states diffèrent
             confirmed_sales = customer.sale_order_ids.filtered(lambda s: s.state in ["confirmed", "done"])
             confirmed_rentals = customer.rental_ids.filtered(lambda r: r.state in ["ongoing", "returned", "done"])
 
@@ -128,9 +200,9 @@ class BikeCustomer(models.Model):
             customer.total_sales_amount = sum(confirmed_sales.mapped("total_amount"))
             customer.total_rental_amount = sum(confirmed_rentals.mapped("total_amount"))
 
-    # Facturation / lien res.partner (si tu l'utilises)
-    partner_id = fields.Many2one("res.partner", string="Contact Odoo", readonly=True, copy=False)
-
+    # ----------------------------
+    # Partner helpers (si tu utilises res.partner)
+    # ----------------------------
     def _prepare_partner_vals(self):
         self.ensure_one()
         full = self._build_full_name() or self.name

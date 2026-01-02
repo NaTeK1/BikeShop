@@ -89,18 +89,13 @@
                         </group>
                     </group>
 
-                    <notebook>
-                        <page string="État du vélo" name="conditions">
-                            <group>
-                                <field name="condition_on_pickup" placeholder="Décrivez l’état du vélo lors du retrait..."/>
-                                <field name="condition_on_return" placeholder="Décrivez l’état du vélo lors du retour..."
-                                       invisible="state not in ['returned']"/>
-                            </group>
-                        </page>
-                        <page string="Notes" name="notes">
-                            <field name="notes" placeholder="Notes de location..."/>
-                        </page>
-                    </notebook>
+                    <group string="État du vélo" name="conditions">
+                        <group>
+                            <field name="condition_on_pickup" placeholder="Décrivez l’état du vélo lors du retrait..."/>
+                            <field name="condition_on_return" placeholder="Décrivez l’état du vélo lors du retour..."
+                                    invisible="state not in ['returned']"/>
+                        </group>
+                    </group>
                 </sheet>
 
                 <!-- Facturation -->
