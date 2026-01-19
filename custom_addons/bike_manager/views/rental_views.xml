@@ -13,7 +13,8 @@
                   decoration-muted="state=='cancelled'">
                 <field name="name" width="11"/>
                 <field name="customer_id" width="11"/>
-                <field name="product_id" width="11"/>
+                <field name="bike_item_id" width="11"/>
+                <field name="product_id" width="11" optional="hide" string="Modèle"/>
                 <field name="start_date" width="11"/>
                 <field name="end_date" width="11"/>
                 <field name="pricing_type" width="11"/>
@@ -55,7 +56,10 @@
                     <group string="DÉTAIL">
                         <group>
                             <field name="customer_id" readonly="state != 'draft'"/>
-                            <field name="product_id" readonly="state != 'draft'"/>
+                            <field name="bike_item_id" readonly="state != 'draft'"
+                                   options="{'no_create': True}"/>
+                            <field name="product_id" readonly="1" force_save="0"
+                                   string="Modèle"/>
                         </group>
                     </group>
 

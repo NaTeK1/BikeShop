@@ -58,6 +58,25 @@ class BikeProduct(models.Model):
 
     # Relations
     rental_ids = fields.One2many('bike.rental', 'product_id', string="Historique des locations")
+    bike_item_ids = fields.One2many('bike.item', 'product_id', string="Vélos individuels",
+                                     help="Liste des vélos physiques de ce modèle")
+
+    # Compteurs pour les vélos individuels
+    total_bike_items = fields.Integer(
+        string="Nombre total de vélos",
+        compute='_compute_bike_item_stats',
+        help="Nombre total de vélos individuels de ce modèle"
+    )
+    available_bike_items = fields.Integer(
+        string="Vélos disponibles",
+        compute='_compute_bike_item_stats',
+        help="Nombre de vélos disponibles pour location ou vente"
+    )
+    rented_bike_items = fields.Integer(
+        string="Vélos loués",
+        compute='_compute_bike_item_stats',
+        help="Nombre de vélos actuellement loués"
+    )
 
     _sql_constraints = [
         ('reference_unique', 'unique(reference)', 'La référence produit doit être unique !')
@@ -106,3 +125,33 @@ class BikeProduct(models.Model):
         for product in self:
             if not product.image_1920:
                 raise exceptions.ValidationError(_("Veuillez ajouter une image pour chaque produit."))
+
+    @api.depends('bike_item_ids', 'bike_item_ids.status', 'bike_item_ids.active')
+    def _compute_bike_item_stats(self):
+        """Calcule les statistiques des vélos individuels"""
+        for product in self:
+            if product.product_type == 'bike':
+                active_items = product.bike_item_ids.filtered(lambda i: i.active)
+                product.total_bike_items = len(active_items)
+                product.available_bike_items = len(active_items.filtered(
+                    lambda i: i.status == 'available'
+                ))
+                product.rented_bike_items = len(active_items.filtered(
+                    lambda i: i.status == 'rented'
+                ))
+            else:
+                product.total_bike_items = 0
+                product.available_bike_items = 0
+                product.rented_bike_items = 0
+
+    def action_view_bike_items(self):
+        """Action pour voir les vélos individuels de ce produit"""
+        self.ensure_one()
+        return {
+            'type': 'ir.actions.act_window',
+            'name': _('Vélos individuels - %s') % self.name,
+            'res_model': 'bike.item',
+            'view_mode': 'tree,kanban,form',
+            'domain': [('product_id', '=', self.id)],
+            'context': {'default_product_id': self.id},
+        }

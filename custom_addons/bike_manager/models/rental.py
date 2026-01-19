@@ -32,12 +32,25 @@ class BikeRental(models.Model):
         required=True,
         ondelete="restrict"
     )
-    product_id = fields.Many2one(
-        "bike.product",
-        string="Vélo",
+
+    # Nouveau: référence vers le vélo individuel
+    bike_item_id = fields.Many2one(
+        "bike.item",
+        string="Vélo individuel",
         required=True,
         ondelete="restrict",
-        domain="[('can_be_rented', '=', True)]"
+        domain="[('usage_type', 'in', ['rental', 'both']), ('status', 'in', ['available', 'reserved'])]",
+        help="Le vélo spécifique qui sera loué (avec numéro de série)"
+    )
+
+    # Référence vers le modèle de produit (via bike_item)
+    product_id = fields.Many2one(
+        "bike.product",
+        string="Modèle de vélo",
+        related="bike_item_id.product_id",
+        store=True,
+        readonly=True,
+        help="Le modèle de vélo (template)"
     )
 
     # Période
@@ -222,18 +235,19 @@ class BikeRental(models.Model):
     # -----------------------------
     # ONCHANGE: prix + date de fin
     # -----------------------------
-    @api.onchange("product_id", "pricing_type")
+    @api.onchange("bike_item_id", "pricing_type")
     def _onchange_product_pricing(self):
         """Met à jour le prix unitaire selon le vélo et le type."""
-        if self.product_id and self.pricing_type:
+        if self.bike_item_id and self.bike_item_id.product_id and self.pricing_type:
+            product = self.bike_item_id.product_id
             if self.pricing_type == "hourly":
-                self.unit_price = self.product_id.rental_price_hourly
+                self.unit_price = product.rental_price_hourly
             elif self.pricing_type == "daily":
-                self.unit_price = self.product_id.rental_price_daily
+                self.unit_price = product.rental_price_daily
             elif self.pricing_type == "weekly":
-                self.unit_price = self.product_id.rental_price_weekly
+                self.unit_price = product.rental_price_weekly
             elif self.pricing_type == "monthly":
-                self.unit_price = self.product_id.rental_price_monthly
+                self.unit_price = product.rental_price_monthly
 
     @api.onchange("start_date", "pricing_type", "hours_qty", "days_qty", "weeks_qty", "months_qty")
     def _onchange_compute_end_date(self):
@@ -332,59 +346,96 @@ class BikeRental(models.Model):
     # -----------------------------
     # DISPONIBILITÉ
     # -----------------------------
-    @api.constrains("product_id", "start_date", "end_date", "state")
+    @api.constrains("bike_item_id", "start_date", "end_date", "state")
     def _check_availability(self):
+        """Vérifie qu'un vélo individuel n'est pas déjà loué sur la période"""
         for r in self:
-            if r.state in ["draft", "ongoing"] and r.product_id and r.start_date and r.end_date:
-                if r.product_id.available_quantity < 1:
-                    overlapping = self.search([
-                        ("id", "!=", r.id),
-                        ("product_id", "=", r.product_id.id),
-                        ("state", "in", ["draft", "ongoing"]),
-                        "|",
-                        "&", ("start_date", "<=", r.start_date), ("end_date", ">", r.start_date),
-                        "&", ("start_date", "<", r.end_date), ("end_date", ">=", r.end_date),
-                    ], limit=1)
-                    if overlapping:
-                        raise exceptions.ValidationError(_(
-                            "Le produit %(product)s n’est pas disponible pour la période sélectionnée !"
-                        ) % {"product": r.product_id.name})
+            if r.state in ["draft", "ongoing"] and r.bike_item_id and r.start_date and r.end_date:
+                # Vérifie que le vélo est disponible pour la location
+                if r.bike_item_id.status not in ['available', 'reserved']:
+                    raise exceptions.ValidationError(_(
+                        "Le vélo %(bike)s (%(serial)s) n'est pas disponible pour la location !"
+                    ) % {
+                        "bike": r.bike_item_id.product_id.name if r.bike_item_id.product_id else "inconnu",
+                        "serial": r.bike_item_id.serial_number
+                    })
+
+                # Vérifie qu'il n'y a pas de chevauchement avec une autre location
+                overlapping = self.search([
+                    ("id", "!=", r.id),
+                    ("bike_item_id", "=", r.bike_item_id.id),
+                    ("state", "in", ["draft", "ongoing"]),
+                    "|",
+                    "&", ("start_date", "<=", r.start_date), ("end_date", ">", r.start_date),
+                    "&", ("start_date", "<", r.end_date), ("end_date", ">=", r.end_date),
+                ], limit=1)
+                if overlapping:
+                    raise exceptions.ValidationError(_(
+                        "Le vélo %(bike)s (%(serial)s) est déjà loué sur cette période !\n"
+                        "Location en conflit: %(rental)s"
+                    ) % {
+                        "bike": r.bike_item_id.product_id.name if r.bike_item_id.product_id else "inconnu",
+                        "serial": r.bike_item_id.serial_number,
+                        "rental": overlapping.name
+                    })
 
     # -----------------------------
     # ACTIONS
     # -----------------------------
     def action_start_rental(self):
+        """Démarre la location et met à jour le statut du vélo"""
         for r in self:
             if r.state != "draft":
                 raise exceptions.ValidationError(_("Seules les locations en brouillon peuvent être démarrées !"))
-            if r.product_id.available_quantity < 1:
+            if not r.bike_item_id:
+                raise exceptions.ValidationError(_("Aucun vélo sélectionné !"))
+            if r.bike_item_id.status not in ['available', 'reserved']:
                 raise exceptions.ValidationError(_(
-                    "Le produit %(product)s n’est pas disponible !"
-                ) % {"product": r.product_id.name})
+                    "Le vélo %(bike)s (%(serial)s) n'est pas disponible !"
+                ) % {
+                    "bike": r.bike_item_id.product_id.name if r.bike_item_id.product_id else "inconnu",
+                    "serial": r.bike_item_id.serial_number
+                })
+
+            # Met à jour le statut du vélo
+            r.bike_item_id.status = 'rented'
             r.state = "ongoing"
 
     def action_return_bike(self):
+        """Retour du vélo et calcul des frais de retard"""
         for r in self:
             if r.state != "ongoing":
                 raise exceptions.ValidationError(_("Seules les locations en cours peuvent être retournées !"))
 
             now = fields.Datetime.now()
 
+            # Calcul des frais de retard
             if r.end_date and now > r.end_date:
                 late_duration = (now - r.end_date).total_seconds() / 3600.0
                 if r.pricing_type == "daily":
                     late_days = late_duration / 24.0
                     r.additional_charges += late_days * (r.unit_price or 0.0) * 1.5
 
+            # Remet le vélo en disponible
+            if r.bike_item_id:
+                r.bike_item_id.status = 'available'
+
             r.state = "returned"
 
     def action_cancel(self):
+        """Annule la location et libère le vélo"""
         for r in self:
             if r.state == "returned":
-                raise exceptions.ValidationError(_("Impossible d’annuler une location retournée !"))
+                raise exceptions.ValidationError(_("Impossible d'annuler une location retournée !"))
+
+            # Libère le vélo si la location était en cours
+            if r.state == "ongoing" and r.bike_item_id:
+                r.bike_item_id.status = 'available'
+
             r.state = "cancelled"
 
     def action_set_draft(self):
+        """Remet en brouillon"""
         for r in self:
             if r.state != "cancelled":
                 raise exceptions.ValidationError(_("Seules les locations annulées peuvent repasser en brouillon !"))
@@ -450,8 +501,13 @@ class BikeRental(models.Model):
         income_account = self._get_income_account()
         tax = self._get_sale_tax_21()
 
+        # Nom détaillé avec le numéro de série
+        bike_description = self.bike_item_id.name if self.bike_item_id else (
+            self.product_id.name if self.product_id else "Vélo"
+        )
+
         line_vals = [{
-            "name": _("Location vélo: %s") % (self.product_id.name),
+            "name": _("Location vélo: %s") % bike_description,
             "quantity": 1.0,
             "price_unit": self.total_price,
             "account_id": income_account.id,

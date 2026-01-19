@@ -32,6 +32,39 @@
                 </header>
 
                 <sheet>
+                    <!-- Smart buttons pour les vélos -->
+                    <div class="oe_button_box" name="button_box" invisible="product_type != 'bike'">
+                        <button name="action_view_bike_items"
+                                type="object"
+                                class="oe_stat_button"
+                                icon="fa-bicycle">
+                            <div class="o_stat_info">
+                                <field name="total_bike_items" class="o_stat_value"/>
+                                <span class="o_stat_text">Vélos</span>
+                            </div>
+                        </button>
+                        <button name="action_view_bike_items"
+                                type="object"
+                                class="oe_stat_button"
+                                icon="fa-check-circle"
+                                context="{'search_default_available': 1}">
+                            <div class="o_stat_info">
+                                <field name="available_bike_items" class="o_stat_value"/>
+                                <span class="o_stat_text">Disponibles</span>
+                            </div>
+                        </button>
+                        <button name="action_view_bike_items"
+                                type="object"
+                                class="oe_stat_button"
+                                icon="fa-key"
+                                context="{'search_default_rented': 1}">
+                            <div class="o_stat_info">
+                                <field name="rented_bike_items" class="o_stat_value"/>
+                                <span class="o_stat_text">Loués</span>
+                            </div>
+                        </button>
+                    </div>
+
                     <div class="oe_title">
                         <h1><field name="name"/></h1>
                     </div>
@@ -75,6 +108,22 @@
                             </group>
                         </page>
 
+                        <page string="Vélos individuels" name="bike_items" invisible="product_type != 'bike'">
+                            <field name="bike_item_ids">
+                                <list string="Vélos" decoration-success="status == 'available'"
+                                      decoration-info="status == 'rented'"
+                                      decoration-warning="status == 'maintenance'"
+                                      decoration-muted="status == 'sold'">
+                                    <field name="serial_number"/>
+                                    <field name="usage_type"/>
+                                    <field name="condition"/>
+                                    <field name="status" widget="badge"/>
+                                    <field name="location"/>
+                                    <field name="rental_count"/>
+                                </list>
+                            </field>
+                        </page>
+
                         <page string="Historique des locations" name="rental_history" invisible="not can_be_rented">
                             <field name="rental_ids">
                                 <list string="Locations">
@@ -98,29 +147,41 @@
         <field name="name">bike.product.kanban</field>
         <field name="model">bike.product</field>
         <field name="arch" type="xml">
-            <kanban class="o_kanban_small_column">
-                <field name="name"/>
-                <field name="reference"/>
+            <kanban>
+                <field name="bike_model_id"/>
                 <field name="sale_price"/>
-                <field name="available_quantity"/>
-                <field name="product_type"/>
-                <field name="category_id"/>
                 <field name="image_1920"/>
+                <field name="category_id"/>
 
                 <templates>
                     <t t-name="card">
-                        <div class="o_kanban_record d-flex">
-                            <div class="o_kanban_image me-2">
-                                <field name="image_1920" widget="image"
-                                    options="{'preview_image': 'image_1920'}"/>
+                        <div class="oe_kanban_global_click d-flex flex-column" style="width: 260px; background: white; border: 1px solid #e0e0e0; border-radius: 4px; overflow: hidden;">
+                            <!-- Image -->
+                            <div class="text-center" style="width: 100%; height: 260px; display: flex; align-items: center; justify-content: center; background: #f8f8f8;">
+                                <field name="image_1920" widget="image" options="{'size': [240, 240]}" style="object-fit: contain;"/>
                             </div>
 
-                            <div class="o_kanban_details flex-grow-1">
-                                <strong><field name="name"/></strong>
-                                <div><field name="reference"/></div>
-                                <div><field name="product_type"/></div>
-                                <div>Prix : <field name="sale_price"/>€</div>
-                                <div>Dispo : <field name="available_quantity"/></div>
+                            <!-- Info produit -->
+                            <div style="padding: 12px;">
+                                <!-- Marque + Modèle -->
+                                <div style="font-size: 14px; color: #666; margin-bottom: 4px;">
+                                    <t t-if="record.bike_model_id.value">
+                                        <field name="bike_model_id"/>
+                                    </t>
+                                    <t t-else="">
+                                        <field name="name"/>
+                                    </t>
+                                </div>
+
+                                <!-- Catégorie -->
+                                <div style="font-size: 13px; color: #999; margin-bottom: 8px;">
+                                    <field name="category_id"/>
+                                </div>
+
+                                <!-- Prix -->
+                                <div class="fw-bold" style="font-size: 18px; color: #000;">
+                                    <field name="sale_price"/> €
+                                </div>
                             </div>
                         </div>
                     </t>
@@ -141,11 +202,16 @@
                 <field name="category_id"/>
                 <field name="product_type"/>
                 <field name="state"/>
+
+                <!-- Panneau de recherche avec catégories -->
+                <searchpanel>
+                    <field name="category_id" icon="fa-tag" enable_counters="1"/>
+                </searchpanel>
             </search>
         </field>
     </record>
 
-    <!-- Action Produits -->
+    <!-- Action Produits (tous) -->
     <record id="action_bike_product" model="ir.actions.act_window">
         <field name="name">Produits</field>
         <field name="res_model">bike.product</field>
@@ -157,6 +223,42 @@
             </p>
             <p>
                 Les produits peuvent être des vélos, des accessoires ou des pièces.
+            </p>
+        </field>
+    </record>
+
+    <!-- Action Vélos uniquement -->
+    <record id="action_bike_catalog" model="ir.actions.act_window">
+        <field name="name">Vélos</field>
+        <field name="res_model">bike.product</field>
+        <field name="view_mode">kanban,list,form</field>
+        <field name="domain">[('product_type', '=', 'bike')]</field>
+        <field name="context">{'default_product_type': 'bike'}</field>
+        <field name="search_view_id" ref="view_bike_product_search"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Créer un modèle de vélo
+            </p>
+            <p>
+                Catalogue de vélos disponibles à la vente ou à la location.
+            </p>
+        </field>
+    </record>
+
+    <!-- Action Accessoires & Pièces uniquement -->
+    <record id="action_bike_accessories" model="ir.actions.act_window">
+        <field name="name">Accessoires &amp; Pièces détachées</field>
+        <field name="res_model">bike.product</field>
+        <field name="view_mode">kanban,list,form</field>
+        <field name="domain">[('product_type', 'in', ['accessory', 'part'])]</field>
+        <field name="context">{'default_product_type': 'accessory'}</field>
+        <field name="search_view_id" ref="view_bike_product_search"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Créer un accessoire ou une pièce
+            </p>
+            <p>
+                Gérez vos casques, antivols, lumières, pneus, et autres accessoires pour vélos.
             </p>
         </field>
     </record>

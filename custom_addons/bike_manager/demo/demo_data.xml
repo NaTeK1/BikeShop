@@ -270,30 +270,127 @@
         <field name="discount">0</field>
     </record>
 
+    <!-- ===== Vélos individuels (bike.item) ===== -->
+    <!-- Trek Domane SL 6 - 2 vélos -->
+    <record id="bike_item_domane_001" model="bike.item">
+        <field name="serial_number">DOM-2024-001</field>
+        <field name="product_id" ref="product_domane_black"/>
+        <field name="usage_type">rental</field>
+        <field name="condition">excellent</field>
+        <field name="purchase_price">2900.00</field>
+        <field name="purchase_date">2024-01-15</field>
+        <field name="sale_price">3999.00</field>
+        <field name="location">Rayon A - Vélos Route - Position 1</field>
+        <field name="notes">Vélo neuf, aucune location encore</field>
+    </record>
+
+    <record id="bike_item_domane_002" model="bike.item">
+        <field name="serial_number">DOM-2024-002</field>
+        <field name="product_id" ref="product_domane_black"/>
+        <field name="usage_type">rental</field>
+        <field name="condition">good</field>
+        <field name="purchase_price">2900.00</field>
+        <field name="purchase_date">2024-01-15</field>
+        <field name="sale_price">3999.00</field>
+        <field name="location">Rayon A - Vélos Route - Position 2</field>
+        <field name="notes">Déjà loué plusieurs fois, en bon état</field>
+        <field name="last_maintenance_date">2024-11-10</field>
+    </record>
+
+    <!-- Trek Marlin 7 - 3 vélos -->
+    <record id="bike_item_marlin_001" model="bike.item">
+        <field name="serial_number">MAR-2024-001</field>
+        <field name="product_id" ref="product_marlin_red"/>
+        <field name="usage_type">rental</field>
+        <field name="condition">excellent</field>
+        <field name="purchase_price">650.00</field>
+        <field name="purchase_date">2024-02-20</field>
+        <field name="sale_price">999.00</field>
+        <field name="location">Rayon B - VTT - Position 1</field>
+    </record>
+
+    <record id="bike_item_marlin_002" model="bike.item">
+        <field name="serial_number">MAR-2024-002</field>
+        <field name="product_id" ref="product_marlin_red"/>
+        <field name="usage_type">both</field>
+        <field name="condition">good</field>
+        <field name="purchase_price">650.00</field>
+        <field name="purchase_date">2024-02-20</field>
+        <field name="sale_price">999.00</field>
+        <field name="location">Rayon B - VTT - Position 2</field>
+        <field name="notes">Peut être vendu ou loué</field>
+    </record>
+
+    <record id="bike_item_marlin_003" model="bike.item">
+        <field name="serial_number">MAR-2024-003</field>
+        <field name="product_id" ref="product_marlin_red"/>
+        <field name="usage_type">sale</field>
+        <field name="condition">excellent</field>
+        <field name="purchase_price">650.00</field>
+        <field name="purchase_date">2024-03-10</field>
+        <field name="sale_price">999.00</field>
+        <field name="location">Vitrine - VTT</field>
+        <field name="notes">Vélo neuf pour vente uniquement</field>
+    </record>
+
+    <!-- Trek Allant+ 7 - 2 vélos -->
+    <record id="bike_item_allant_001" model="bike.item">
+        <field name="serial_number">ALL-2024-001</field>
+        <field name="product_id" ref="product_allant_grey"/>
+        <field name="usage_type">rental</field>
+        <field name="condition">excellent</field>
+        <field name="purchase_price">2300.00</field>
+        <field name="purchase_date">2024-03-01</field>
+        <field name="sale_price">3299.00</field>
+        <field name="location">Rayon C - Vélos Électriques - Position 1</field>
+        <field name="notes">Vélo électrique, batterie neuve</field>
+    </record>
+
+    <record id="bike_item_allant_002" model="bike.item">
+        <field name="serial_number">ALL-2024-002</field>
+        <field name="product_id" ref="product_allant_grey"/>
+        <field name="usage_type">rental</field>
+        <field name="condition">poor</field>
+        <field name="status">maintenance</field>
+        <field name="purchase_price">2300.00</field>
+        <field name="purchase_date">2024-03-01</field>
+        <field name="sale_price">3299.00</field>
+        <field name="location">Atelier</field>
+        <field name="notes">En révision, problème moteur électrique</field>
+        <field name="maintenance_notes">Révision moteur électrique en cours</field>
+        <field name="last_maintenance_date">2024-12-10</field>
+    </record>
+
     <!-- ===== Locations ===== -->
+    <!-- Location 1: Terminée (historique) -->
     <record id="rental_demo_1" model="bike.rental">
         <field name="name">RNT-DEMO-0001</field>
         <field name="customer_id" ref="customer_lucas_martin"/>
-        <field name="product_id" ref="product_domane_black"/>
-        <field name="start_date">2025-12-14 09:00:00</field>
-        <field name="end_date">2025-12-21 09:00:00</field>
+        <field name="bike_item_id" ref="bike_item_domane_001"/>
+        <field name="start_date">2025-11-14 09:00:00</field>
+        <field name="end_date">2025-11-21 09:00:00</field>
         <field name="pricing_type">weekly</field>
+        <field name="weeks_qty">1</field>
         <field name="unit_price">450.00</field>
         <field name="deposit_amount">150.00</field>
-        <field name="state">ongoing</field>
+        <field name="state">returned</field>
         <field name="payment_method">card</field>
         <field name="is_paid">True</field>
+        <field name="deposit_returned">True</field>
         <field name="condition_on_pickup">Très bon état, freins OK, pneus OK.</field>
-        <field name="notes">Location semaine.</field>
+        <field name="condition_on_return">Bon état, retour conforme.</field>
+        <field name="notes">Location semaine - Terminée.</field>
     </record>
 
+    <!-- Location 2: Terminée (historique) -->
     <record id="rental_demo_2" model="bike.rental">
         <field name="name">RNT-DEMO-0002</field>
         <field name="customer_id" ref="customer_jean_dupont"/>
-        <field name="product_id" ref="product_marlin_red"/>
+        <field name="bike_item_id" ref="bike_item_marlin_001"/>
         <field name="start_date">2025-12-01 10:00:00</field>
         <field name="end_date">2025-12-03 10:00:00</field>
         <field name="pricing_type">daily</field>
+        <field name="days_qty">2</field>
         <field name="unit_price">50.00</field>
         <field name="deposit_amount">200.00</field>
         <field name="additional_charges">0.00</field>
@@ -306,15 +403,17 @@
         <field name="notes">Retour conforme.</field>
     </record>
 
+    <!-- Location 3: En brouillon (réservation future) -->
     <record id="rental_demo_3" model="bike.rental">
         <field name="name">RNT-DEMO-0003</field>
         <field name="customer_id" ref="customer_marie_lambert"/>
-        <field name="product_id" ref="product_allant_grey"/>
-        <field name="start_date">2025-12-18 09:00:00</field>
-        <field name="end_date">2025-12-19 09:00:00</field>
+        <field name="bike_item_id" ref="bike_item_domane_002"/>
+        <field name="start_date">2026-01-25 09:00:00</field>
+        <field name="end_date">2026-01-26 09:00:00</field>
         <field name="pricing_type">daily</field>
-        <field name="unit_price">80.00</field>
-        <field name="deposit_amount">250.00</field>
+        <field name="days_qty">1</field>
+        <field name="unit_price">90.00</field>
+        <field name="deposit_amount">150.00</field>
         <field name="state">draft</field>
         <field name="payment_method">transfer</field>
         <field name="is_paid">False</field>

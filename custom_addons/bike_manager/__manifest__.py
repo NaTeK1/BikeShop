@@ -24,6 +24,7 @@ Interface et libellés en français.
     "license": "LGPL-3",
     "depends": [
         "base",
+        "mail",
         "calendar",
         "contacts",
         "crm",
@@ -44,10 +45,14 @@ Interface et libellés en français.
         # Séquences
         "data/sequences.xml",
 
+        # Images des catégories
+        "data/category_images.xml",
+
         # Vues
         "views/category_views.xml",
         "views/bike_model_views.xml",
         "views/product_views.xml",
+        "views/bike_item_views.xml",
         "views/customer_views.xml",
         "views/rental_views.xml",
         "views/sale_order_views.xml",

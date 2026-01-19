@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <data>
+        <!-- Images pour les catégories -->
+        <function model="bike.category" name="_load_category_images"/>
+    </data>
+</odoo>

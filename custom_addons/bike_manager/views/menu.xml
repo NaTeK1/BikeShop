@@ -17,10 +17,36 @@
         sequence="10"
     />
 
+    <!-- Menu simplifié: seulement Vélos et Accessoires -->
+    <menuitem
+        id="menu_bike_catalog"
+        name="Vélos"
+        parent="menu_bike_shop_catalog"
+        action="action_bike_category_catalog"
+        sequence="10"
+    />
+
+    <menuitem
+        id="menu_bike_accessories"
+        name="Accessoires &amp; Pièces détachées"
+        parent="menu_bike_shop_catalog"
+        action="action_bike_accessories"
+        sequence="20"
+    />
+
+    <!-- Menu Configuration -->
+    <menuitem
+        id="menu_bike_shop_config"
+        name="Configuration"
+        parent="menu_bike_shop_root"
+        sequence="50"
+        action="action_bike_category"
+    />
+
     <menuitem
         id="menu_bike_categories"
         name="Catégories"
-        parent="menu_bike_shop_catalog"
+        parent="menu_bike_shop_config"
         action="action_bike_category"
         sequence="10"
     />
@@ -28,17 +54,25 @@
     <menuitem
         id="menu_bike_models"
         name="Modèles de vélos"
-        parent="menu_bike_shop_catalog"
+        parent="menu_bike_shop_config"
         action="action_bike_model"
         sequence="20"
     />
 
     <menuitem
         id="menu_bike_products"
-        name="Produits"
-        parent="menu_bike_shop_catalog"
+        name="Tous les produits"
+        parent="menu_bike_shop_config"
         action="action_bike_product"
         sequence="30"
+    />
+
+    <menuitem
+        id="menu_bike_item"
+        name="Vélos individuels (Stock)"
+        parent="menu_bike_shop_config"
+        action="action_bike_item"
+        sequence="40"
     />
 
     <!-- MENU VENTES -->
@@ -95,14 +129,6 @@
         parent="menu_bike_shop_rentals"
         action="action_bike_rental"
         sequence="10"
-    />
-
-    <!-- MENU RAPPORTS -->
-    <menuitem
-        id="menu_bike_shop_reporting"
-        name="Rapports"
-        parent="menu_bike_shop_root"
-        sequence="50"
     />
 
 </odoo>
