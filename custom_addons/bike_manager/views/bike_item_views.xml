@@ -7,19 +7,28 @@
         <field name="arch" type="xml">
             <form string="Vélo individuel">
                 <header>
-                    <field name="status" widget="statusbar" statusbar_visible="available,rented,sold"/>
+                    <button name="action_send_to_maintenance" string="Envoyer en maintenance" type="object"
+                            class="oe_highlight" invisible="status in ['maintenance', 'rented', 'sold']"
+                            groups="bike_manager.group_bike_manager"/>
+                    <button name="action_return_from_maintenance" string="Retour de maintenance" type="object"
+                            class="oe_highlight" invisible="status != 'maintenance'"
+                            groups="bike_manager.group_bike_manager"/>
+                    <button name="action_mark_as_sold" string="Marquer comme vendu" type="object"
+                            invisible="status in ['sold', 'rented']"
+                            groups="bike_manager.group_bike_manager"/>
+                    <field name="status" widget="statusbar" statusbar_visible="available,rented,maintenance,sold"/>
                 </header>
                 <sheet>
                     <group>
-                        <field name="serial_number"/>
+                        <field name="serial_number" placeholder="Ex: BIKE-2025-001"/>
                         <field name="product_id"/>
                         <field name="bike_model_id"/>
                         <field name="category_id"/>
                         <field name="usage_type"/>
-                        <field name="condition"/>
-                        <field name="location"/>
-                        <field name="purchase_date"/>
-                        <field name="purchase_price"/>
+                        <field name="condition" groups="bike_manager.group_bike_manager"/>
+                        <field name="location" placeholder="Ex: Magasin principal, Entrepôt A..." groups="bike_manager.group_bike_manager"/>
+                        <field name="purchase_date" groups="bike_manager.group_bike_manager"/>
+                        <field name="purchase_price" groups="bike_manager.group_bike_manager"/>
                         <field name="sale_price"/>
                     </group>
                 </sheet>
@@ -50,10 +59,10 @@
                        decoration-info="status == 'rented'"
                        decoration-warning="status == 'maintenance'"
                        decoration-danger="status == 'sold'"/>
-                <field name="location"/>
-                <field name="rental_count"/>
+                <field name="location" groups="bike_manager.group_bike_manager"/>
+                <field name="rental_count" groups="bike_manager.group_bike_manager"/>
                 <field name="sale_price" optional="hide"/>
-                <field name="purchase_date" optional="hide"/>
+                <field name="purchase_date" optional="hide" groups="bike_manager.group_bike_manager"/>
             </list>
         </field>
     </record>

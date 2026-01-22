@@ -8,8 +8,8 @@
         <field name="arch" type="xml">
             <list string="Catégories">
                 <field name="name"/>
-                <field name="product_count"/>
-                <field name="active"/>
+                <field name="product_count" groups="bike_manager.group_bike_manager"/>
+                <field name="active" groups="bike_manager.group_bike_manager"/>
             </list>
         </field>
     </record>
@@ -24,24 +24,25 @@
                     <field name="image_1920" widget="image" class="oe_avatar"/>
 
                     <div class="oe_title">
-                        <h1><field name="name"/></h1>
+                        <h1><field name="name" placeholder="Ex: VTT, Vélos de route..."/></h1>
                     </div>
 
                     <group>
                         <group string="Informations">
-                            <field name="active"/>
+                            <field name="active" groups="bike_manager.group_bike_manager"/>
                         </group>
-                        <group string="Statistiques">
+                        <group string="Statistiques" groups="bike_manager.group_bike_manager">
                             <field name="product_count" readonly="1"/>
                         </group>
                     </group>
 
-                    <group string="Description">
-                        <field name="description" nolabel="1" placeholder="Description de la catégorie..."/>
-                    </group>
+                    <separator string="Description" style="margin-top: 16px;"/>
+                    <div style="padding: 16px; background: #f9f9f9; border-radius: 4px; margin: 8px 0;">
+                        <field name="description" nolabel="1" placeholder="Description de la catégorie..." widget="text"/>
+                    </div>
 
                     <notebook>
-                        <page string="Produits" name="products">
+                        <page string="Produits" name="products" groups="bike_manager.group_bike_manager">
                             <field name="product_ids">
                                 <list string="Produits">
                                     <field name="reference"/>
@@ -104,12 +105,11 @@
 
     <!-- Action Catalogue vélos (pour le menu client) -->
     <record id="action_bike_category_catalog" model="ir.actions.act_window">
-        <field name="name">Catalogue de vélos</field>
+        <field name="name">Vélos</field>
         <field name="res_model">bike.product</field>
         <field name="view_mode">kanban,list,form</field>
         <field name="domain">[('product_type', '=', 'bike'), ('category_id.name', 'not in', ['Accessoires', 'Pièces'])]</field>
         <field name="search_view_id" ref="view_bike_product_search"/>
-        <field name="context">{'create': False, 'delete': False}</field>
         <field name="help" type="html">
             <p class="o_view_nocontent_smiling_face">
                 Aucun vélo disponible

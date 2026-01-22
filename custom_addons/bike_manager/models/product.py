@@ -11,7 +11,7 @@ class BikeProduct(models.Model):
     _inherit = ["image.mixin"]
 
     name = fields.Char(string="Nom du produit", required=True)
-    reference = fields.Char(string="Référence interne", required=True, copy=False)
+    reference = fields.Char(string="Référence interne", readonly=True, copy=False, default='/')
     description = fields.Text(string="Description")
     image_1920 = fields.Image(string="Image", max_width=1920, max_height=1920)
 
@@ -81,6 +81,14 @@ class BikeProduct(models.Model):
     _sql_constraints = [
         ('reference_unique', 'unique(reference)', 'La référence produit doit être unique !')
     ]
+
+    @api.model_create_multi
+    def create(self, vals_list):
+        """Génère automatiquement la référence si elle n'est pas fournie"""
+        for vals in vals_list:
+            if not vals.get('reference') or vals.get('reference') == '/':
+                vals['reference'] = self.env['ir.sequence'].next_by_code('bike.product') or '/'
+        return super().create(vals_list)
 
     @api.depends('rental_ids', 'rental_ids.state')
     def _compute_reserved_quantity(self):

@@ -175,9 +175,9 @@ class BikeItem(models.Model):
             if not item.sale_price and item.product_id:
                 item.sale_price = item.product_id.sale_price
 
-    @api.depends('rental_ids', 'rental_ids.state', 'usage_type')
+    @api.depends('rental_ids', 'rental_ids.state', 'usage_type', 'condition')
     def _compute_status(self):
-        """Calcule le statut en fonction des locations actives"""
+        """Calcule le statut en fonction des locations actives et de l'état physique"""
         for item in self:
             # Si vendu, toujours vendu
             if item.status == 'sold':
@@ -198,6 +198,7 @@ class BikeItem(models.Model):
             elif item.condition == 'poor':
                 item.status = 'maintenance'
             else:
+                # Si aucune location active et condition OK, remettre en disponible
                 item.status = 'available'
 
     @api.depends('rental_ids')

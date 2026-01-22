@@ -112,7 +112,7 @@
                                 domain="[('can_be_rented','=',False)]"
                                 invisible="state != 'ongoing'"/>
                             <field name="extras_total" readonly="1" invisible="state != 'ongoing'"/>
-                            <field name="manual_extra_amount" invisible="state != 'ongoing'"/>
+                            <field name="manual_extra_amount" invisible="state != 'ongoing'" groups="bike_manager.group_bike_manager"/>
 
                             <!-- Total -->
                             <label for="total_amount" string="Prix total"/>
@@ -120,7 +120,7 @@
                         </group>
 
                         <!-- Résumé des frais (uniquement retournée) -->
-                        <group string="Frais supplémentaires" invisible="state != 'returned'">
+                        <group string="Frais supplémentaires" invisible="state != 'returned'" groups="bike_manager.group_bike_manager">
                             <group>
                                 <field name="extras_total" readonly="1"/>
                                 <field name="manual_extra_amount" readonly="1"/>
@@ -133,19 +133,19 @@
                     <group string="Paiement">
                         <group>
                             <field name="payment_method" readonly="state == 'cancelled'"/>
-                            <field name="is_paid" invisible="state != 'returned'"/>
-                            <field name="deposit_returned" invisible="state != 'returned'"/>
+                            <field name="is_paid" invisible="state != 'returned'" groups="bike_manager.group_bike_manager"/>
+                            <field name="deposit_returned" invisible="state != 'returned'" groups="bike_manager.group_bike_manager"/>
                         </group>
                     </group>
 
                     <!-- ÉTAT DU VÉLO -->
-                    <group string="État du vélo">
+                    <group string="État du vélo" groups="bike_manager.group_bike_manager">
                         <group>
                             <field name="condition_on_pickup"
-                                   placeholder="Décrivez l’état du vélo lors du retrait..."
+                                   placeholder="Décrivez l'état du vélo lors du retrait..."
                                    readonly="state != 'draft'"/>
                             <field name="condition_on_return"
-                                   placeholder="Décrivez l’état du vélo lors du retour..."
+                                   placeholder="Décrivez l'état du vélo lors du retour..."
                                    invisible="state != 'returned'"/>
                         </group>
                     </group>
@@ -154,7 +154,7 @@
                 </sheet>
 
                 <!-- Facturation -->
-                <div class="oe_button_box" name="button_box">
+                <div class="oe_button_box" name="button_box" groups="bike_manager.group_bike_manager">
                     <button name="action_create_invoice" type="object" class="oe_stat_button"
                             icon="fa-file-text-o" invisible="invoice_id">
                         <div class="o_stat_info">

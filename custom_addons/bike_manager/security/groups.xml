@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <!-- Groupe pour les gestionnaires du magasin de vélos -->
+    <record id="group_bike_manager" model="res.groups">
+        <field name="name">Bike Shop Manager</field>
+        <field name="comment">Accès complet à toutes les fonctionnalités du magasin de vélos, incluant les informations financières et administratives.</field>
+    </record>
+</odoo>

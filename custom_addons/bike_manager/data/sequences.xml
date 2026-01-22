@@ -22,5 +22,15 @@
             <field name="active">True</field>
         </record>
 
+        <record id="seq_bike_product" model="ir.sequence">
+            <field name="name">Séquence des produits</field>
+            <field name="code">bike.product</field>
+            <field name="prefix">BIKE-</field>
+            <field name="padding">3</field>
+            <field name="number_increment">1</field>
+            <field name="number_next">1</field>
+            <field name="active">True</field>
+        </record>
+
     </data>
 </odoo>

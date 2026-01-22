@@ -34,46 +34,6 @@
         sequence="20"
     />
 
-    <!-- Menu Configuration -->
-    <menuitem
-        id="menu_bike_shop_config"
-        name="Configuration"
-        parent="menu_bike_shop_root"
-        sequence="50"
-        action="action_bike_category"
-    />
-
-    <menuitem
-        id="menu_bike_categories"
-        name="Catégories"
-        parent="menu_bike_shop_config"
-        action="action_bike_category"
-        sequence="10"
-    />
-
-    <menuitem
-        id="menu_bike_models"
-        name="Modèles de vélos"
-        parent="menu_bike_shop_config"
-        action="action_bike_model"
-        sequence="20"
-    />
-
-    <menuitem
-        id="menu_bike_products"
-        name="Tous les produits"
-        parent="menu_bike_shop_config"
-        action="action_bike_product"
-        sequence="30"
-    />
-
-    <menuitem
-        id="menu_bike_item"
-        name="Vélos individuels (Stock)"
-        parent="menu_bike_shop_config"
-        action="action_bike_item"
-        sequence="40"
-    />
 
     <!-- MENU VENTES -->
     <menuitem
@@ -113,6 +73,7 @@
         parent="menu_bike_shop_customers"
         action="action_bike_customer_stats"
         sequence="20"
+        groups="bike_manager.group_bike_manager"
     />
 
     <!-- MENU LOCATIONS -->

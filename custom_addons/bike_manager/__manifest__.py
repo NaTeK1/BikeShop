@@ -40,6 +40,7 @@ Interface et libellés en français.
         "demo/demo_data.xml",
 
         # Sécurité
+        "security/groups.xml",
         "security/ir.model.access.csv",
 
         # Séquences
@@ -57,10 +58,6 @@ Interface et libellés en français.
         "views/rental_views.xml",
         "views/sale_order_views.xml",
         "views/menu.xml",
-
-        # Rapports
-        "reports/report_rental_contract.xml",
-        "reports/rental_contract_template.xml",
     ],
     "assets": {
         "web.assets_backend": [

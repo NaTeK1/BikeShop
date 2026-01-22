@@ -7,91 +7,67 @@
         <field name="model">bike.product</field>
         <field name="arch" type="xml">
             <list string="Produits">
-                <field name="reference"/>
+                <field name="reference" groups="bike_manager.group_bike_manager"/>
                 <field name="name"/>
                 <field name="product_type"/>
                 <field name="category_id"/>
                 <field name="sale_price"/>
-                <field name="stock_quantity"/>
-                <field name="reserved_quantity"/>
-                <field name="available_quantity"/>
-                <field name="state"/>
-                <field name="active"/>
+                <field name="stock_quantity" groups="bike_manager.group_bike_manager"/>
+                <field name="reserved_quantity" groups="bike_manager.group_bike_manager"/>
+                <field name="available_quantity" groups="bike_manager.group_bike_manager"/>
+                <field name="state" groups="bike_manager.group_bike_manager"/>
+                <field name="active" groups="bike_manager.group_bike_manager"/>
             </list>
         </field>
     </record>
 
-    <!-- Vue formulaire Produit -->
-    <record id="view_bike_product_form" model="ir.ui.view">
-        <field name="name">bike.product.form</field>
+    <!-- Vue formulaire Produit (Modifiable pour Administrateurs) -->
+    <record id="view_bike_product_form_editable" model="ir.ui.view">
+        <field name="name">bike.product.form.editable</field>
         <field name="model">bike.product</field>
+        <field name="priority">1</field>
         <field name="arch" type="xml">
             <form string="Produit">
                 <header>
-                    <field name="state" widget="statusbar"/>
+                    <field name="state" widget="statusbar" groups="bike_manager.group_bike_manager"/>
                 </header>
 
                 <sheet>
-                    <!-- Smart buttons pour les vélos -->
-                    <div class="oe_button_box" name="button_box" invisible="product_type != 'bike'">
-                        <button name="action_view_bike_items"
-                                type="object"
-                                class="oe_stat_button"
-                                icon="fa-bicycle">
-                            <div class="o_stat_info">
-                                <field name="total_bike_items" class="o_stat_value"/>
-                                <span class="o_stat_text">Vélos</span>
-                            </div>
-                        </button>
-                        <button name="action_view_bike_items"
-                                type="object"
-                                class="oe_stat_button"
-                                icon="fa-check-circle"
-                                context="{'search_default_available': 1}">
-                            <div class="o_stat_info">
-                                <field name="available_bike_items" class="o_stat_value"/>
-                                <span class="o_stat_text">Disponibles</span>
-                            </div>
-                        </button>
-                        <button name="action_view_bike_items"
-                                type="object"
-                                class="oe_stat_button"
-                                icon="fa-key"
-                                context="{'search_default_rented': 1}">
-                            <div class="o_stat_info">
-                                <field name="rented_bike_items" class="o_stat_value"/>
-                                <span class="o_stat_text">Loués</span>
-                            </div>
-                        </button>
-                    </div>
-
                     <div class="oe_title">
-                        <h1><field name="name"/></h1>
+                        <h1><field name="name" placeholder="Nom du produit"/></h1>
                     </div>
 
                     <group>
                         <group string="Informations de base">
-                            <field name="reference"/>
-                            <field name="product_type"/>
-                            <field name="category_id"/>
-                            <field name="bike_model_id" invisible="product_type != 'bike'"/>
+                            <field name="reference" groups="bike_manager.group_bike_manager"/>
+                            <field name="product_type" readonly="1" force_save="1"/>
+                            <field name="category_id"
+                                   domain="[('name', 'not in', ['Accessoires', 'Pièces'])]"
+                                   invisible="product_type in ['accessory', 'part']"
+                                   options="{'no_create': False, 'no_create_edit': False}"/>
+                            <field name="category_id"
+                                   domain="[('name', 'in', ['Accessoires', 'Pièces'])]"
+                                   invisible="product_type == 'bike'"
+                                   options="{'no_create': False, 'no_create_edit': False}"/>
+                            <field name="bike_model_id" invisible="product_type != 'bike'"
+                                   options="{'no_create': False, 'no_create_edit': False}"/>
                             <field name="image_1920" widget="image" class="oe_avatar"
                                    options="{'preview_image': 'image_1920'}"/>
                         </group>
 
                         <group string="Stock et prix">
                             <field name="sale_price"/>
-                            <field name="cost_price"/>
-                            <field name="stock_quantity"/>
-                            <field name="reserved_quantity" readonly="1"/>
-                            <field name="available_quantity" readonly="1"/>
-                            <field name="active"/>
+                            <field name="stock_quantity" groups="bike_manager.group_bike_manager"/>
+                            <field name="reserved_quantity" readonly="1" groups="bike_manager.group_bike_manager"/>
+                            <field name="available_quantity" readonly="1" groups="bike_manager.group_bike_manager"/>
+                            <field name="active" groups="bike_manager.group_bike_manager"/>
                         </group>
                     </group>
 
-                    <group string="Description">
-                        <field name="description" nolabel="1" placeholder="Description du produit..."/>
-                    </group>
+                    <separator string="Description" style="margin-top: 16px;"/>
+                    <div style="padding: 16px; background: #f9f9f9; border-radius: 4px; margin: 8px 0;">
+                        <field name="description" nolabel="1" placeholder="Description du produit..." widget="text"/>
+                    </div>
 
                     <notebook>
                         <page string="Informations de location" name="rental_info">
@@ -108,9 +84,10 @@
                             </group>
                         </page>
 
-                        <page string="Vélos individuels" name="bike_items" invisible="product_type != 'bike'">
+                        <page string="Vélos" name="bike_items" invisible="product_type != 'bike'" groups="bike_manager.group_bike_manager">
                             <field name="bike_item_ids">
-                                <list string="Vélos" decoration-success="status == 'available'"
+                                <list string="Vélos"
+                                      decoration-success="status == 'available'"
                                       decoration-info="status == 'rented'"
                                       decoration-warning="status == 'maintenance'"
                                       decoration-muted="status == 'sold'">
@@ -119,12 +96,11 @@
                                     <field name="condition"/>
                                     <field name="status" widget="badge"/>
                                     <field name="location"/>
-                                    <field name="rental_count"/>
                                 </list>
                             </field>
                         </page>
 
-                        <page string="Historique des locations" name="rental_history" invisible="not can_be_rented">
+                        <page string="Historique des locations" name="rental_history" invisible="not can_be_rented" groups="bike_manager.group_bike_manager">
                             <field name="rental_ids">
                                 <list string="Locations">
                                     <field name="name"/>
@@ -198,10 +174,10 @@
         <field name="arch" type="xml">
             <search string="Produits">
                 <field name="name"/>
-                <field name="reference"/>
+                <field name="reference" groups="bike_manager.group_bike_manager"/>
                 <field name="category_id"/>
                 <field name="product_type"/>
-                <field name="state"/>
+                <field name="state" groups="bike_manager.group_bike_manager"/>
 
                 <!-- Panneau de recherche avec catégories -->
                 <searchpanel>
@@ -255,10 +231,7 @@
         <field name="search_view_id" ref="view_bike_product_search"/>
         <field name="help" type="html">
             <p class="o_view_nocontent_smiling_face">
-                Créer un accessoire ou une pièce
-            </p>
-            <p>
-                Gérez vos casques, antivols, lumières, pneus, et autres accessoires pour vélos.
+                Aucun accessoire disponible
             </p>
         </field>
     </record>

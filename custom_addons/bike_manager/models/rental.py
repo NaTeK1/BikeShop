@@ -351,15 +351,6 @@ class BikeRental(models.Model):
         """Vérifie qu'un vélo individuel n'est pas déjà loué sur la période"""
         for r in self:
             if r.state in ["draft", "ongoing"] and r.bike_item_id and r.start_date and r.end_date:
-                # Vérifie que le vélo est disponible pour la location
-                if r.bike_item_id.status not in ['available', 'reserved']:
-                    raise exceptions.ValidationError(_(
-                        "Le vélo %(bike)s (%(serial)s) n'est pas disponible pour la location !"
-                    ) % {
-                        "bike": r.bike_item_id.product_id.name if r.bike_item_id.product_id else "inconnu",
-                        "serial": r.bike_item_id.serial_number
-                    })
-
                 # Vérifie qu'il n'y a pas de chevauchement avec une autre location
                 overlapping = self.search([
                     ("id", "!=", r.id),

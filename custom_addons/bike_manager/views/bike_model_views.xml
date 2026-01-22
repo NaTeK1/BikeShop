@@ -13,8 +13,8 @@
                 <field name="category_id"/>
                 <field name="frame_material"/>
                 <field name="wheel_size"/>
-                <field name="product_count"/>
-                <field name="active"/>
+                <field name="product_count" groups="bike_manager.group_bike_manager"/>
+                <field name="active" groups="bike_manager.group_bike_manager"/>
             </list>
         </field>
     </record>
@@ -36,23 +36,23 @@
 
                     <group>
                         <group string="Informations">
-                            <field name="year"/>
-                            <field name="category_id"/>
-                            <field name="active"/>
+                            <field name="year" placeholder="Ex: 2025" options="{'type': 'number'}"/>
+                            <field name="active" groups="bike_manager.group_bike_manager"/>
                         </group>
                         <group string="Caractéristiques">
                             <field name="frame_material"/>
                             <field name="wheel_size"/>
-                            <field name="product_count" readonly="1"/>
+                            <field name="product_count" readonly="1" groups="bike_manager.group_bike_manager"/>
                         </group>
                     </group>
 
-                    <group string="Description">
-                        <field name="description" nolabel="1" placeholder="Description du modèle..."/>
-                    </group>
+                    <separator string="Description" style="margin-top: 16px;"/>
+                    <div style="padding: 16px; background: #f9f9f9; border-radius: 4px; margin: 8px 0;">
+                        <field name="description" nolabel="1" placeholder="Description du modèle..." widget="text"/>
+                    </div>
 
                     <notebook>
-                        <page string="Produits liés" name="products">
+                        <page string="Produits liés" name="products" groups="bike_manager.group_bike_manager">
                             <field name="product_ids">
                                 <list string="Produits">
                                     <field name="reference"/>
@@ -83,7 +83,7 @@
                 <field name="category_id"/>
                 <field name="frame_material"/>
                 <field name="wheel_size"/>
-                <field name="active"/>
+                <field name="active" groups="bike_manager.group_bike_manager"/>
             </search>
         </field>
     </record>
